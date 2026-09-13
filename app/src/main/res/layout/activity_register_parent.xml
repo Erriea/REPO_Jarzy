@@ -7,47 +7,40 @@
     android:padding="24dp">
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tvRegisterTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Jarzy - Log In"
+        android:text="Create Parent Account"
         android:textSize="24sp"
         android:layout_marginBottom="24dp" />
 
     <EditText
-        android:id="@+id/etUsername"
+        android:id="@+id/etRegUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Username"
+        android:hint="Choose a username"
         android:inputType="text" />
 
     <EditText
-        android:id="@+id/etPassword"
+        android:id="@+id/etRegPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Password"
+        android:hint="Choose a password"
         android:inputType="textPassword"
         android:layout_marginTop="8dp" />
 
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Log In"
+        android:text="Register"
         android:layout_marginTop="16dp" />
 
     <TextView
-        android:id="@+id/tvError"
+        android:id="@+id/tvRegError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#D32F2F"
         android:layout_marginTop="12dp" />
-
-    <Button
-        android:id="@+id/btnGoToRegister"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Register as Parent"
-        android:layout_marginTop="24dp" />
 
 </LinearLayout>
