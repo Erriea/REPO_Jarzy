@@ -5,10 +5,16 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+//Expense is a single spending record logged against one child and one category.
+//(Android Developers, n.b)
+// Two foreign keys are declared below, both explained by Android Developers (n.d.);
+// Ranju (n.d.) also walks through setting up a Room entity with relationships like this.
+
+
 @Entity(
     tableName = "expenses",
     indices = [
-        Index(value = ["childId"]),
+        Index(value = ["childId"]), //
         Index(value = ["categoryId"])
     ],
     foreignKeys = [
@@ -16,13 +22,13 @@ import androidx.room.PrimaryKey
             entity = ChildAccount::class,
             parentColumns = ["childId"],
             childColumns = ["childId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE //deleting child deletes their expenses
         ),
         ForeignKey(
             entity = Category::class,
             parentColumns = ["categoryId"],
             childColumns = ["categoryId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE //delete category = delete expenses
         )
     ]
 )
@@ -32,9 +38,16 @@ data class Expense(
     val childId: Long,
     val categoryId: Long,
     val amount: Double,
-    val date: Long,
-    val startTime: String,   //"HH:mm"
-    val endTime: String,     //"HH:mm"
-    val description: String,
-    val photoUri: String? = null
+    val date: Long, // stored as a Unix timestamp (milliseconds), not a String, so date-range queries work
+    val description: String, // optional stored as "" if blank
+    val photoUri: String? = null // nullable. A receipt photo is optional, added in a later step
 )
+
+// References:
+// Android Developers, n.d. Define data using Room entities [Webpage].
+// Available at: <https://developer.android.com/training/data-storage/room/defining-data>
+// [Accessed 10 September 2026].
+// Ranju, S., n.d. Step-by-Step: Setting Up and Implementing Room Database in Android
+// [Webpage]. Available at:
+// <https://medium.com/@sdranju/step-by-step-how-to-setting-up-and-implementing-room-database-aeb211c56702>
+// [Accessed 10 September 2026].

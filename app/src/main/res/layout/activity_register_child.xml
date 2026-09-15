@@ -3,49 +3,63 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="24dp">
 
     <Button
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
         android:text="Back"
         android:layout_marginBottom="16dp" />
 
     <TextView
-        android:id="@+id/tvRegisterTitle"
+        android:id="@+id/tvRegChildTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Parent Account"
-        android:textSize="24sp"
+        android:text="Register a Child Account"
+        android:textSize="22sp"
         android:layout_marginBottom="24dp" />
 
     <EditText
-        android:id="@+id/etRegUsername"
+        android:id="@+id/etChildUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Choose a username"
+        android:hint="Child's username"
         android:inputType="text" />
 
     <EditText
-        android:id="@+id/etRegPassword"
+        android:id="@+id/etChildPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Choose a password"
+        android:hint="Child's password"
         android:inputType="textPassword"
         android:layout_marginTop="8dp" />
 
-    <Button
-        android:id="@+id/btnRegister"
+    <EditText
+        android:id="@+id/etMinGoal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Register"
+        android:hint="Minimum monthly spending goal"
+        android:inputType="numberDecimal"
+        android:layout_marginTop="8dp" />
+
+    <EditText
+        android:id="@+id/etMaxGoal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Maximum monthly spending goal"
+        android:inputType="numberDecimal"
+        android:layout_marginTop="8dp" />
+
+    <Button
+        android:id="@+id/btnRegisterChild"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register Child"
         android:layout_marginTop="16dp" />
 
     <TextView
-        android:id="@+id/tvRegError"
+        android:id="@+id/tvRegChildError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#D32F2F"
