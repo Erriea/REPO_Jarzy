@@ -1,13 +1,19 @@
 package com.dani.jarzy
 
 import android.app.DatePickerDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.dani.jarzy.data.Expense
@@ -18,11 +24,11 @@ import java.util.Calendar
 
 /**
  * AddExpenseActivity lets a parent log a new expense for a specific child: an amount, a
- * date, a category picked from a dropdown, and an optional description. The category
- * dropdown now shows the CHILD's own savings categories (not a parent-shared list), and
- * the amount spent is deducted straight from whichever category it's recorded against -
- * it can never exceed what that category currently holds.
- *
+ * date, a category picked from a dropdown, an optional receipt photo, and an optional
+ * description. The category dropdown shows the CHILD's own savings categories (not a
+ * parent-shared list), and the amount spent is deducted straight from whichever category
+ * it's recorded against - it can never exceed what that category currently holds, and it
+ * can never be logged on a future date.
  */
 class AddExpenseActivity : AppCompatActivity() {
 
@@ -30,9 +36,29 @@ class AddExpenseActivity : AppCompatActivity() {
 
     private var categories: List<SavingsCategory> = emptyList()
     private var selectedDateMillis: Long? = null
+    private var selectedPhotoUri: Uri? = null // optional - stays null if no photo is picked
     private var childId: Long = -1L
 
     private lateinit var spinnerCategory: Spinner
+    private lateinit var ivReceiptPreview: ImageView
+
+    // Registered as a class property (rather than inside onCreate or a listener) because
+    // the system requires this call to happen before the Activity is STARTED - the
+    // callback lambda itself only actually runs later, once the user picks a photo
+    // (Android Developers, n.d.).
+    private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            selectedPhotoUri = uri
+
+            // The photo picker only grants read access "until the app stops" by default -
+            // taking a persistable permission here means the photo is still viewable if
+            // the user leaves this screen and comes back to it later (Android Developers, n.d.).
+            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            ivReceiptPreview.visibility = View.VISIBLE
+            ivReceiptPreview.setImageURI(uri)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +72,8 @@ class AddExpenseActivity : AppCompatActivity() {
         val etDescription = findViewById<EditText>(R.id.etDescription)
         val btnPickDate = findViewById<Button>(R.id.btnPickDate)
         spinnerCategory = findViewById(R.id.spinnerCategory)
+        val btnAddPhoto = findViewById<Button>(R.id.btnAddPhoto)
+        ivReceiptPreview = findViewById(R.id.ivReceiptPreview)
         val btnSaveExpense = findViewById<Button>(R.id.btnSaveExpense)
         val tvExpenseError = findViewById<TextView>(R.id.tvExpenseError)
 
@@ -65,6 +93,13 @@ class AddExpenseActivity : AppCompatActivity() {
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
             ).show()
+        }
+
+        // Opens Android's own Photo Picker screen, restricted to images only - this needs
+        // no storage permission at all, unlike older ways of picking a gallery image
+        // (Android Developers, n.d.).
+        btnAddPhoto.setOnClickListener {
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
         btnSaveExpense.setOnClickListener {
@@ -124,7 +159,8 @@ class AddExpenseActivity : AppCompatActivity() {
                         savingsCategoryId = selectedCategory.savingsCategoryId,
                         amount = amount,
                         date = dateMillis,
-                        description = description
+                        description = description,
+                        photoUri = selectedPhotoUri?.toString() // stays null if no photo was picked
                     )
                 )
 
@@ -169,3 +205,8 @@ class AddExpenseActivity : AppCompatActivity() {
 //     [Accessed 13 September 2026].
 // GeeksforGeeks, 2019. Spinner in Kotlin [Webpage]. Available at:
 //     https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 13 September 2026].
+// Gonzalez, M.L., 2025. Get Date Without Time in Java [Webpage]. Available at:
+//     https://www.baeldung.com/java-date-without-time [Accessed 15 September 2026].
+// Android Developers, n.d. Select photos and videos with the photo picker [Webpage].
+//     Available at: <https://developer.android.com/training/data-storage/shared/photopicker>
+//     [Accessed 15 September 2026].

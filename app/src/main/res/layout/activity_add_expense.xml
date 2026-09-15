@@ -52,13 +52,37 @@
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp" />
 
+    <Button
+        android:id="@+id/btnAddPhoto"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Add Receipt Photo (Optional)"
+        app:layout_constraintTop_toBottomOf="@id/spinnerCategory"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp" />
+
+    <ImageView
+        android:id="@+id/ivReceiptPreview"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:visibility="gone"
+        android:contentDescription="Receipt photo preview"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toBottomOf="@id/btnAddPhoto"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" />
+
     <EditText
         android:id="@+id/etDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Description (optional)"
         android:inputType="text"
-        app:layout_constraintTop_toBottomOf="@id/spinnerCategory"
+        app:layout_constraintTop_toBottomOf="@id/ivReceiptPreview"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
