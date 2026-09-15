@@ -17,22 +17,53 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp" />
 
-    <Button
-        android:id="@+id/btnCreateCategory"
+    <TextView
+        android:id="@+id/tvSavingsTotal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Category"
+        android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/tvChildWelcome"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/tvSavingsBreakdown"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvSavingsTotal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp" />
+
+    <Button
+        android:id="@+id/btnAddSavingsGoal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+ Add Savings Goal"
+        app:layout_constraintTop_toBottomOf="@id/tvSavingsBreakdown"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp" />
+
+    <Button
+        android:id="@+id/btnViewExpenseHistory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Expense History"
+        app:layout_constraintTop_toBottomOf="@id/btnAddSavingsGoal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
 
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Log Out"
-        app:layout_constraintTop_toBottomOf="@id/btnCreateCategory"
+        app:layout_constraintTop_toBottomOf="@id/btnAddSavingsGoal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />

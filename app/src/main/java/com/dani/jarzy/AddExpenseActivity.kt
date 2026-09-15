@@ -1,7 +1,6 @@
 package com.dani.jarzy
 
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -11,36 +10,27 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.dani.jarzy.data.Category
 import com.dani.jarzy.data.Expense
 import com.dani.jarzy.data.JarzyDatabase
+import com.dani.jarzy.data.SavingsCategory
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
 /**
  * AddExpenseActivity lets a parent log a new expense for a specific child: an amount, a
- * date, a category picked from a dropdown, and an optional description.
- * NOTE: at this prototype stage there is no check yet that stops an expense being logged
- * on a future date, and no check that caps an expense at the child's account balance -
- * both are planned changes from lecturer feedback, not implemented in this pass, which is
- * comments/references only.
+ * date, a category picked from a dropdown, and an optional description. The category
+ * dropdown now shows the CHILD's own savings categories (not a parent-shared list), and
+ * the amount spent is deducted straight from whichever category it's recorded against -
+ * it can never exceed what that category currently holds.
+ *
  */
-
 class AddExpenseActivity : AppCompatActivity() {
 
     private lateinit var database: JarzyDatabase
 
-
-    // Holds the last category list loaded from the database
-    // Spinner's selected position can be matched back to a real Category object when the user saves.
-    private var categories: List<Category> = emptyList()
-
-    // Nullable because no date has been chosen yet when the screen first opens
-    // tells "nothing picked" apart from a real picked date further down.
+    private var categories: List<SavingsCategory> = emptyList()
     private var selectedDateMillis: Long? = null
-
     private var childId: Long = -1L
-    private var parentId: Long = -1L
 
     private lateinit var spinnerCategory: Spinner
 
@@ -50,35 +40,21 @@ class AddExpenseActivity : AppCompatActivity() {
 
         database = JarzyDatabase.getDatabase(this)
         childId = intent.getLongExtra("CHILD_ID", -1L)
-        parentId = intent.getLongExtra("PARENT_ID", -1L)
 
         val btnBack = findViewById<Button>(R.id.btnBack)
         val etAmount = findViewById<EditText>(R.id.etAmount)
         val etDescription = findViewById<EditText>(R.id.etDescription)
         val btnPickDate = findViewById<Button>(R.id.btnPickDate)
         spinnerCategory = findViewById(R.id.spinnerCategory)
-        val btnAddCategory = findViewById<Button>(R.id.btnAddCategory)
         val btnSaveExpense = findViewById<Button>(R.id.btnSaveExpense)
         val tvExpenseError = findViewById<TextView>(R.id.tvExpenseError)
 
         btnBack.setOnClickListener { finish() }
 
-        // Shortcut so the user isn't stuck if wanted category doesn't exist yet
-        // opens category creation and forwards this parent's id.
-        btnAddCategory.setOnClickListener {
-            val intent = Intent(this, CreateCategoryActivity::class.java)
-            intent.putExtra("PARENT_ID", parentId)
-            startActivity(intent)
-        }
-
         btnPickDate.setOnClickListener {
-            // DatePickerDialog needs a starting point to open on, so we grab today's date
-            // from Calendar.getInstance() first (Chavan, 2023).
             val calendar = Calendar.getInstance()
             DatePickerDialog(
                 this,
-                // This lambda is the callback DatePickerDialog converts into a single millisecond timestamp
-                // using another Calendar instance
                 { _, year, month, dayOfMonth ->
                     val picked = Calendar.getInstance()
                     picked.set(year, month, dayOfMonth, 0, 0, 0)
@@ -93,7 +69,7 @@ class AddExpenseActivity : AppCompatActivity() {
 
         btnSaveExpense.setOnClickListener {
             val amountText = etAmount.text.toString().trim()
-            val description = etDescription.text.toString().trim() // optional -> saved as "" if left blank
+            val description = etDescription.text.toString().trim()
             val categoryIndex = spinnerCategory.selectedItemPosition
 
             if (childId == -1L) {
@@ -101,14 +77,11 @@ class AddExpenseActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Covers both "no categories exist yet" and "nothing is selected" with one check.
             if (categories.isEmpty() || categoryIndex < 0 || categoryIndex >= categories.size) {
-                tvExpenseError.text = "No categories yet - tap '+ New Category' to add one."
+                tvExpenseError.text = "This child has no savings categories yet."
                 return@setOnClickListener
             }
 
-            // toDoubleOrNull() again for safe text-to-number conversion (Tutorialspoint, n.d.).
-            // An expense of 0 or less isn't a real expense, so that's rejected too.
             val amount = amountText.toDoubleOrNull()
             if (amount == null || amount <= 0) {
                 tvExpenseError.text = "Amount must be a valid number greater than 0."
@@ -121,36 +94,63 @@ class AddExpenseActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            // Zeroing out today's time fields the same way the picked date already is
+            // (see btnPickDate above) makes this a pure day-vs-day comparison, not one
+            // that depends on what time it happens to be right now (Gonzalez, 2025).
+            val todayMidnight = Calendar.getInstance()
+            todayMidnight.set(Calendar.HOUR_OF_DAY, 0)
+            todayMidnight.set(Calendar.MINUTE, 0)
+            todayMidnight.set(Calendar.SECOND, 0)
+            todayMidnight.set(Calendar.MILLISECOND, 0)
+
+            if (dateMillis > todayMidnight.timeInMillis) {
+                Toast.makeText(this, "You can't log an expense on a future date.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val selectedCategory = categories[categoryIndex]
+
+            // The cap: an expense can never draw more out of a category than it currently
+            // holds.
+            if (amount > selectedCategory.amountSaved) {
+                tvExpenseError.text = "That category only has %.2f available.".format(selectedCategory.amountSaved)
+                return@setOnClickListener
+            }
 
             lifecycleScope.launch {
                 database.expenseDao().insert(
                     Expense(
                         childId = childId,
-                        categoryId = selectedCategory.categoryId,
+                        savingsCategoryId = selectedCategory.savingsCategoryId,
                         amount = amount,
                         date = dateMillis,
                         description = description
                     )
                 )
+
+                // Recording the expense deducts it from the category it was spent from -
+                // the same pattern CreateSavingsCategoryActivity uses for its source category.
+                database.savingsCategoryDao().update(
+                    selectedCategory.copy(amountSaved = selectedCategory.amountSaved - amount)
+                )
+
                 Toast.makeText(this@AddExpenseActivity, "Expense saved!", Toast.LENGTH_LONG).show()
                 finish()
             }
         }
     }
 
-
-    // reload categories every time this screen becomes visible
-    // category added shows up immediately when returned (Android Developers, n.d.)
+    // Reloads categories (and their current amounts) every time this screen becomes
+    // visible, so the cap check always reflects up-to-date figures (Android Developers, 2026).
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            categories = database.categoryDao().getCategoriesForParent(parentId)
-            val names = categories.map { it.name }
+            categories = database.savingsCategoryDao().getCategoriesForChild(childId)
+            val labels = categories.map { "${it.name} (%.2f)".format(it.amountSaved) }
             spinnerCategory.adapter = ArrayAdapter(
                 this@AddExpenseActivity,
                 android.R.layout.simple_spinner_dropdown_item,
-                names
+                labels
             )
         }
     }

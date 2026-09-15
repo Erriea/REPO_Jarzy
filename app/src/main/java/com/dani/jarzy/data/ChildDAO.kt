@@ -40,6 +40,10 @@ interface ChildDao {
     // used on the parent's home screen to populate the "which child?" dropdown
     @Query("SELECT * FROM child_accounts WHERE parentId = :parentId")
     suspend fun getChildrenForParent(parentId: Long): List<ChildAccount>
+
+    // gets full ChildAccount row, including the current savingsBalance
+    @Query("SELECT * FROM child_accounts WHERE childId = :childId LIMIT 1")
+    suspend fun getById(childId: Long): ChildAccount?
 }
 
 // References:

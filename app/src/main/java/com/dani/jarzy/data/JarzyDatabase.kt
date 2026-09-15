@@ -10,26 +10,21 @@ import androidx.room.RoomDatabase
 // Android Developers (n.d.) and Ranju (n.d.) both walk through setting up this same @Database class.
 
 @Database(
-    entities = [ParentAccount::class, ChildAccount::class, Category::class, Expense::class],
+    entities = [ParentAccount::class, ChildAccount::class, Expense::class, SavingsCategory::class],
     version = 1,
     exportSchema = false
 )
 abstract class JarzyDatabase : RoomDatabase() {
 
-    // one abstract function per DAO
-    // Room implements these automatically giving rest of the app a way to reach each table's operations
     abstract fun parentDao(): ParentDao
     abstract fun childDao(): ChildDao
-    abstract fun categoryDao(): CategoryDao
     abstract fun expenseDao(): ExpenseDao
+    abstract fun savingsCategoryDao(): SavingsCategoryDao
 
     companion object {
-        // @Volatile makes writes to instance visible to every thread immediately
-        // two threads can't each end up building their own separate copy of the database
         @Volatile
         private var INSTANCE: JarzyDatabase? = null
 
-        // Singleton pattern - only one instance of the database is ever open (Android Developers, n.d.)
         fun getDatabase(context: Context): JarzyDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(

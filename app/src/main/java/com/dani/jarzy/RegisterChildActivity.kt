@@ -9,15 +9,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.dani.jarzy.data.ChildAccount
 import com.dani.jarzy.data.JarzyDatabase
+import com.dani.jarzy.data.SavingsCategory
 import kotlinx.coroutines.launch
 
 /**
  * RegisterChildActivity is opened from inside a parent's account (ParentHomeActivity)
- * and creates a new child account linked to that specific parent. It also collects the
- * child's minimum/maximum monthly spending goals, which are used elsewhere in the app to
- * give the parent a sense of whether the child is spending within a healthy range.
+ * and creates a new child account linked to that specific parent. It also seeds a
+ * starting "General" savings category for the new child - every child needs at least
+ * one category to exist, since that's where the parent's budget lands before the child
+ * organises it further.
  */
-
 class RegisterChildActivity : AppCompatActivity() {
 
     private lateinit var database: JarzyDatabase
@@ -28,9 +29,6 @@ class RegisterChildActivity : AppCompatActivity() {
 
         database = JarzyDatabase.getDatabase(this)
 
-        // Read the parentId that was attached to the Intent used to launch this screen.
-        // -1L is used as a "not found" default so we can detect a missing/invalid id below
-        // instead of silently registering a child with a broken parent link (Vogel, 2016).
         val parentId = intent.getLongExtra("PARENT_ID", -1L)
 
         val btnBack = findViewById<Button>(R.id.btnBack)
@@ -49,20 +47,16 @@ class RegisterChildActivity : AppCompatActivity() {
             val minGoalText = etMinGoal.text.toString().trim()
             val maxGoalText = etMaxGoal.text.toString().trim()
 
-
-            //checks if parent is missing from intent and treat as error
             if (parentId == -1L) {
                 tvError.text = "Something went wrong identifying the parent account. Please go back and try again."
                 return@setOnClickListener
             }
 
-            // all four fields are required before we even look at the database.
             if (username.isEmpty() || password.isEmpty() || minGoalText.isEmpty() || maxGoalText.isEmpty()) {
                 tvError.text = "Please fill in all fields."
                 return@setOnClickListener
             }
 
-            // toDoubleOrNull() returns null instead of crashing if the text isn't a valid number
             val minGoal = minGoalText.toDoubleOrNull()
             val maxGoal = maxGoalText.toDoubleOrNull()
 
@@ -71,22 +65,21 @@ class RegisterChildActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // A max goal smaller than the min goal doesn't make sense
-            // reject it here rather than storing an inconsistent pair of values.
             if (maxGoal < minGoal) {
                 tvError.text = "Maximum goal cannot be less than the minimum goal."
                 return@setOnClickListener
             }
 
             lifecycleScope.launch {
-                // Same duplicate-username protection used on the parent registration screen.
                 val existing = database.childDao().getByUsername(username)
                 if (existing != null) {
                     tvError.text = "That username is already taken."
                     return@launch
                 }
 
-                database.childDao().insert(
+                // insert() returns the new childId, which we need immediately below to
+                // create that child's first savings category.
+                val newChildId = database.childDao().insert(
                     ChildAccount(
                         parentId = parentId,
                         username = username,
@@ -95,12 +88,21 @@ class RegisterChildActivity : AppCompatActivity() {
                         maxMonthlyGoal = maxGoal
                     )
                 )
+
+                // Every new child starts with one "General" savings category, empty for
+                // now - this guarantees there's always somewhere for a parent's budget to
+                // land, even before the child creates categories of their own.
+                database.savingsCategoryDao().insert(
+                    SavingsCategory(childId = newChildId, name = "General")
+                )
+
                 Toast.makeText(this@RegisterChildActivity, "Child account created!", Toast.LENGTH_LONG).show()
                 finish()
             }
         }
     }
 }
+
 // References:
 // Vogel, L., 2016. Android Intents - Tutorial (Version 0.3) [Webpage]. Available at:
 //     https://www.vogella.com/tutorials/AndroidIntent/article.html [Accessed 12 September 2026].

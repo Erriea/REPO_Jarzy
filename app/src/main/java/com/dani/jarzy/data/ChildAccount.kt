@@ -8,13 +8,15 @@ import androidx.room.PrimaryKey
 //Room entity representing one child's login and spending goals.
 // Android Developers (n.d.) explains how @Entity classes map to tables, and the same
 // idea is walked through step by step in CodingSTUFF's (2024) Room tutorial.
+// NOTE: there used to be a savingsBalance field here - it's been removed. A child's total
+// savings is now always calculated as the sum of their own SavingsCategory rows (via
+// SavingsCategoryDao.getCategoriesForChild), so there's only ever one source of truth.
 @Entity(
     tableName = "child_accounts",
     indices = [
         Index(value = ["username"], unique = true), // no two children share username
         Index(value = ["parentId"]) //find all children for this parent
     ],
-    // A foreign key enforces link at database level so cant point at non-exisiting parent
     foreignKeys = [
         ForeignKey(
             entity = ParentAccount::class,
@@ -28,7 +30,7 @@ data class ChildAccount(
     @PrimaryKey(autoGenerate = true)
     val childId: Long = 0,
     val parentId: Long, //links parent to child
-    val username: String, //must be unique
+    val username: String, //unique
     val password: String, //stored as plain text for now
     val minMonthlyGoal: Double = 0.0, // lower bounds of child's monthly spending
     val maxMonthlyGoal: Double = 0.0 //upper bounds of child's monthly spending

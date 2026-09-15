@@ -15,17 +15,13 @@ import kotlinx.coroutines.launch
 /**
  * ParentHomeActivity is the screen a parent lands on after logging in. From here they
  * can register a new child, pick one of their existing children from a dropdown, and
- * jump into logging an expense for that child.
+ * open that child's own detail page - which is where budget, expenses and savings for
+ * that specific child are actually managed (see ChildDetailActivity).
  */
-
 class ParentHomeActivity : AppCompatActivity() {
 
     private lateinit var database: JarzyDatabase
 
-    // Kept as class-level fields because both onCreate() and onResume() need to read/write them
-    // children holds the last list loaded from the
-    // database so the Spinner's selected position can be matched back to an actual
-    // ChildAccount object, and parentId identifies whose children we should be loading.
     private var children: List<ChildAccount> = emptyList()
     private var parentId: Long = -1L
 
@@ -43,36 +39,31 @@ class ParentHomeActivity : AppCompatActivity() {
         val btnRegisterChild = findViewById<Button>(R.id.btnRegisterChild)
         val btnLogout = findViewById<Button>(R.id.btnLogout)
         spinnerChildren = findViewById(R.id.spinnerChildren)
-        val btnAddExpense = findViewById<Button>(R.id.btnAddExpense)
+        val btnViewChild = findViewById<Button>(R.id.btnViewChild)
 
         tvWelcome.text = "Welcome, $parentUsername"
 
-        // Opens the child registration screen with this parent's id
-        // new child gets linked to the right parent.
         btnRegisterChild.setOnClickListener {
             val intent = Intent(this, RegisterChildActivity::class.java)
             intent.putExtra("PARENT_ID", parentId)
             startActivity(intent)
         }
 
-        btnAddExpense.setOnClickListener {
-            // selectedItemPosition tells which row of the dropdown is highlighted.
+        // Opens the selected child's own detail page rather than acting on them
+        // directly from this screen - budget, expenses and savings all live there now
+        // (Vogel, 2016).
+        btnViewChild.setOnClickListener {
             val selectedIndex = spinnerChildren.selectedItemPosition
             if (selectedIndex < 0 || selectedIndex >= children.size) {
                 return@setOnClickListener
             }
             val selectedChild = children[selectedIndex]
-            val intent = Intent(this, AddExpenseActivity::class.java)
+            val intent = Intent(this, ChildDetailActivity::class.java)
             intent.putExtra("CHILD_ID", selectedChild.childId)
-            intent.putExtra("PARENT_ID", parentId)
+            intent.putExtra("CHILD_USERNAME", selectedChild.username)
             startActivity(intent)
         }
 
-        // Logging out sends the user back to MainActivity
-        // sets two special flags set on the Intent:
-        // NEW_TASK starts a fresh task, and CLEAR_TASK wipes out every screen currently sitting underneath it.
-        // Together they stop the user from pressing the phone's Back button after logging out and
-        // ending up back on this "logged in" screen (Kumar, 2025).
         btnLogout.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -81,18 +72,11 @@ class ParentHomeActivity : AppCompatActivity() {
         }
     }
 
-    // onResume runs every time this screen becomes visible again, including when returned
-    // after registering new child
-    // the dropdown always shows current data
-    // (Android Developers, 2026)
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
             children = database.childDao().getChildrenForParent(parentId)
             val usernames = children.map { it.username }
-            // ArrayAdapter takes our plain list of usernames and turns it into the rows the
-            // Spinner (Android's drop-down widget) actually displays on screen
-            // (GeeksforGeeks, 2019).
             spinnerChildren.adapter = ArrayAdapter(
                 this@ParentHomeActivity,
                 android.R.layout.simple_spinner_dropdown_item,
@@ -104,11 +88,13 @@ class ParentHomeActivity : AppCompatActivity() {
 
 // References:
 // Android Developers, 2026. The activity lifecycle [Webpage]. Available at:
-// https://developer.android.com/guide/components/activities/activity-lifecycle
-// [Accessed 15 September 2026].
+//     https://developer.android.com/guide/components/activities/activity-lifecycle
+//     [Accessed 15 September 2026].
 // GeeksforGeeks, 2019. Spinner in Kotlin [Webpage]. Available at:
-// https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 15 September 2026].
+//     https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 15 September 2026].
 // Kumar, M., 2025. Mastering Android Launch Modes and Intent Flags: A Complete Developer
-// Guide [Webpage]. Available at:
-// https://medium.com/@manishkumar_75473/mastering-android-launch-modes-and-intent-flags-a-complete-developer-guide-f44d298e29c9
-// [Accessed 15 September 2026].
+//     Guide [Webpage]. Available at:
+//     https://medium.com/@manishkumar_75473/mastering-android-launch-modes-and-intent-flags-a-complete-developer-guide-f44d298e29c9
+//     [Accessed 15 September 2026].
+// Vogel, L., 2016. Android Intents - Tutorial (Version 0.3) [Webpage]. Available at:
+//     https://www.vogella.com/tutorials/AndroidIntent/article.html [Accessed 15 September 2026].

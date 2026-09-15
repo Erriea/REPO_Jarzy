@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CreateCategoryActivity">
+    tools:context=".CreateSavingsCategoryActivity">
 
     <Button
         android:id="@+id/btnBack"
@@ -16,13 +16,34 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp" />
 
-    <EditText
-        android:id="@+id/etCategoryName"
+    <TextView
+        android:id="@+id/tvFromLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Move money from:"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="24dp" />
+
+    <Spinner
+        android:id="@+id/spinnerFromCategory"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Category name"
+        app:layout_constraintTop_toBottomOf="@id/tvFromLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp" />
+
+    <EditText
+        android:id="@+id/etGoalName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Move to (existing or new category name)"
         android:inputType="text"
-        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:layout_constraintTop_toBottomOf="@id/spinnerFromCategory"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
@@ -30,12 +51,12 @@
         android:layout_marginEnd="24dp" />
 
     <EditText
-        android:id="@+id/etCategoryBudget"
+        android:id="@+id/etGoalAmount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Monthly budget amount"
+        android:hint="Amount to move"
         android:inputType="numberDecimal"
-        app:layout_constraintTop_toBottomOf="@id/etCategoryName"
+        app:layout_constraintTop_toBottomOf="@id/etGoalName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
@@ -43,21 +64,21 @@
         android:layout_marginEnd="24dp" />
 
     <Button
-        android:id="@+id/btnSaveCategory"
+        android:id="@+id/btnSaveGoal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Category"
-        app:layout_constraintTop_toBottomOf="@id/etCategoryBudget"
+        android:text="Move Money"
+        app:layout_constraintTop_toBottomOf="@id/etGoalAmount"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp" />
 
     <TextView
-        android:id="@+id/tvCategoryError"
+        android:id="@+id/tvGoalError"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="#FF0000"
-        app:layout_constraintTop_toBottomOf="@id/btnSaveCategory"
+        app:layout_constraintTop_toBottomOf="@id/btnSaveGoal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
