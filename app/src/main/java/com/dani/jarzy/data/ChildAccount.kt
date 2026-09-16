@@ -36,9 +36,15 @@ data class ChildAccount(
 )
 
 // References:
-// Android Developers, n.d. Define data using Room entities [Webpage].
-// Available at: <https://developer.android.com/training/data-storage/room/defining-data>
+// Android Developers, 2026.-a. Access data using Room DAOs [Webpage].
+// Available at: <https://developer.android.com/training/data-storage/room/accessing-data>
 // [Accessed 10 September 2026].
-// CodingSTUFF, 2024. The Complete Beginner Guide for Room in Android 2024 | Local
-// Database Tutorial for Android - Part 1 [Video].
-// Available at: <https://www.youtube.com/watch?v=r_UfOz3yaLg> [Accessed 10 September 2026].
+
+// Android Developers, 2024.-b. Read and update data with Room [Webpage].
+// Available at: <https://developer.android.com/codelabs/basic-android-kotlin-compose-update-data-room#0>
+// [Accessed 10 September 2026].
+
+// Google, 2026. The error 'unexpected jvm signature V' is a known bug in KSP2,
+// GitHub Issue #2957 [Webpage].
+// Available at: <https://github.com/google/ksp/issues/2957> [Accessed 11 September 2026].
+

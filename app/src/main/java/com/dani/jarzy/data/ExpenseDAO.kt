@@ -41,14 +41,17 @@ interface ExpenseDao {
 }
 
 // References:
-// Android Developers, n.d.-a. Access data using Room DAOs [Webpage].
+// Android Developers, 2026.-a. Access data using Room DAOs [Webpage].
 // Available at: <https://developer.android.com/training/data-storage/room/accessing-data>
-// [Accessed 12 September 2026].
-// Android Developers, n.d.-b. Read and update data with Room [Webpage].
+// [Accessed 15 September 2026].
+
+// Android Developers, 2024.-b. Read and update data with Room [Webpage].
 // Available at: <https://developer.android.com/codelabs/basic-android-kotlin-compose-update-data-room#0>
-// [Accessed 11 September 2026].
-// Google, n.d. The error 'unexpected jvm signature V' is a known bug in KSP2,
+// [Accessed 15 September 2026].
+
+// Google, 2026. The error 'unexpected jvm signature V' is a known bug in KSP2,
 // GitHub Issue #2957 [Webpage].
-// Available at: <https://github.com/google/ksp/issues/2957> [Accessed 11 September 2026].
+// Available at: <https://github.com/google/ksp/issues/2957> [Accessed 15 September 2026].
+
 // SQLite Tutorial, n.d. SQLite Left Join [Webpage].
-// Available at: <https://www.sqlitetutorial.net/sqlite-left-join/> [Accessed 10 September 2026].
+// Available at: <https://www.sqlitetutorial.net/sqlite-left-join/> [Accessed 15 September 2026].

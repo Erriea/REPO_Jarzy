@@ -43,16 +43,15 @@ abstract class JarzyDatabase : RoomDatabase() {
 }
 
 // References:
-// Android Developers, n.d. Save data in a local database using Room [Webpage].
+// Android Developers, 2026. Save data in a local database using Room [Webpage].
 // Available at: <https://developer.android.com/training/data-storage/room>
 // [Accessed 12 September 2026].
-// Ranju, S., n.d. Step-by-Step: Setting Up and Implementing Room Database in Android
+
+// Ranju, S., 2024. Step-by-Step: Setting Up and Implementing Room Database in Android
 // [Webpage]. Available at:
 // <https://medium.com/@sdranju/step-by-step-how-to-setting-up-and-implementing-room-database-aeb211c56702>
 // [Accessed 12 September 2026].
+
 // CodingSTUFF, 2024. The Complete Beginner Guide for Room in Android 2024 | Local
 // Database Tutorial for Android - Part 1 [Video].
 // Available at: <https://www.youtube.com/watch?v=r_UfOz3yaLg> [Accessed 12 September 2026].
-// Android Developers, n.d. RoomDatabase.Builder [Webpage]. Available at:
-// <https://developer.android.com/reference/kotlin/androidx/room/RoomDatabase.Builder>
-// [Accessed 16 September 2026].

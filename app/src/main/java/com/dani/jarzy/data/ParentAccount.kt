@@ -24,9 +24,10 @@ data class ParentAccount(
 )
 
 // References:
-// Android Developers, n.d. Define data using Room entities [Webpage].
+// Android Developers, 2026. Define data using Room entities [Webpage].
 // Available at: <https://developer.android.com/training/data-storage/room/defining-data>
 // [Accessed 10 September 2026].
-// GeeksforGeeks, n.d. Room Database with Kotlin Coroutines in Android [Webpage].
+
+// GeeksforGeeks, 2024. Room Database with Kotlin Coroutines in Android [Webpage].
 // Available at: <https://www.geeksforgeeks.org/android/room-database-with-kotlin-coroutines-in-android/>
 // [Accessed 10 September 2026].

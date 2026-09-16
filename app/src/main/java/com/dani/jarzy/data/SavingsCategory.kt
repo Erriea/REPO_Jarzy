@@ -32,6 +32,6 @@ data class SavingsCategory(
 )
 
 // References:
-// Android Developers, n.d. Define data using Room entities [Webpage].
+// Android Developers, 2026. Define data using Room entities [Webpage].
 // Available at: <https://developer.android.com/training/data-storage/room/defining-data>
 // [Accessed 14 September 2026].

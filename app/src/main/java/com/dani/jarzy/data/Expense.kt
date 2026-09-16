@@ -44,10 +44,10 @@ data class Expense(
 )
 
 // References:
-// Android Developers, n.d. Define data using Room entities [Webpage].
+// Android Developers, 2026. Define data using Room entities [Webpage].
 // Available at: <https://developer.android.com/training/data-storage/room/defining-data>
 // [Accessed 12 September 2026].
-// Ranju, S., n.d. Step-by-Step: Setting Up and Implementing Room Database in Android
-// [Webpage]. Available at:
-// <https://medium.com/@sdranju/step-by-step-how-to-setting-up-and-implementing-room-database-aeb211c56702>
-// [Accessed 10 September 2026].
+
+// Ranju, S., 2024. Step-by-Step: Setting Up and Implementing Room Database in Android [Webpage].
+//Available at: <https://medium.com/@sdranju/step-by-step-how-to-setting-up-and-implementing-room-database-aeb211c56702>
+// [Accessed 12 September 2026].

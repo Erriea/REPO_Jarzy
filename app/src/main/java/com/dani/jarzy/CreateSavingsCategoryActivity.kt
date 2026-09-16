@@ -125,11 +125,13 @@ class CreateSavingsCategoryActivity : AppCompatActivity() {
 }
 
 // References:
-// Tutorialspoint, n.d. Kotlin String - toDoubleOrNull() Function [Webpage]. Available at:
+// Tutorialspoint, 2026. Kotlin String - toDoubleOrNull() Function [Webpage]. Available at:
 //     https://www.tutorialspoint.com/kotlin/kotlin_string_todoubleornull_function.htm
-//     [Accessed 15 September 2026].
+//     [Accessed 8 September 2026].
+
 // Android Developers, 2026. The activity lifecycle [Webpage]. Available at:
 //     https://developer.android.com/guide/components/activities/activity-lifecycle
-//     [Accessed 15 September 2026].
-// GeeksforGeeks, 2019. Spinner in Kotlin [Webpage]. Available at:
-//     https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 15 September 2026].
+//     [Accessed 8 September 2026].
+
+// GeeksforGeeks, 2025. Spinner in Kotlin [Webpage]. Available at:
+//     https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 14  September 2026].

@@ -25,6 +25,6 @@ interface ParentDao {
 }
 
 // References:
-// Android Developers, n.d. Access data using Room DAOs [Webpage].
+// Android Developers, 2026. Access data using Room DAOs [Webpage].
 // Available at: <https://developer.android.com/training/data-storage/room/accessing-data>
 // [Accessed 12 September 2026].
