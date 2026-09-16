@@ -38,8 +38,8 @@ interface SavingsCategoryDao {
 
 // References:
 // Android Developers, n.d.-a. Access data using Room DAOs [Webpage]. Available at:
-//     <https://developer.android.com/training/data-storage/room/accessing-data>
-//     [Accessed 15 September 2026].
+// <https://developer.android.com/training/data-storage/room/accessing-data>
+// [Accessed 12 September 2026].
 // Google, n.d. The error 'unexpected jvm signature V' is a known bug in KSP2, GitHub
-//     Issue #2957 [Webpage]. Available at: <https://github.com/google/ksp/issues/2957>
-//     [Accessed 15 September 2026].
+// Issue #2957 [Webpage]. Available at: <https://github.com/google/ksp/issues/2957>
+// [Accessed 12 September 2026].

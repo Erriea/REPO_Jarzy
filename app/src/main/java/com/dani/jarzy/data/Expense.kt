@@ -5,8 +5,8 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-//Expense is a single spending record logged against one child and one of that child's own
-//savings categories - spending now draws down directly from the category it's recorded
+//Expense is a single spending record logged against one child and one of that child's own savings categories
+// spending now draws down directly from the category it's recorded
 //against, rather than a separate parent-owned category list (Android Developers, n.b)
 // Two foreign keys are declared below, both explained by Android Developers (n.d.);
 // Ranju (n.d.) also walks through setting up a Room entity with relationships like this.
@@ -46,8 +46,8 @@ data class Expense(
 // References:
 // Android Developers, n.d. Define data using Room entities [Webpage].
 // Available at: <https://developer.android.com/training/data-storage/room/defining-data>
-// [Accessed 15 September 2026].
+// [Accessed 12 September 2026].
 // Ranju, S., n.d. Step-by-Step: Setting Up and Implementing Room Database in Android
 // [Webpage]. Available at:
 // <https://medium.com/@sdranju/step-by-step-how-to-setting-up-and-implementing-room-database-aeb211c56702>
-// [Accessed 15 September 2026].
+// [Accessed 10 September 2026].

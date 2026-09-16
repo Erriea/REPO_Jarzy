@@ -23,12 +23,12 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 
 /**
- * AddExpenseActivity lets a parent log a new expense for a specific child: an amount, a
- * date, a category picked from a dropdown, an optional receipt photo, and an optional
- * description. The category dropdown shows the CHILD's own savings categories (not a
- * parent-shared list), and the amount spent is deducted straight from whichever category
- * it's recorded against - it can never exceed what that category currently holds, and it
- * can never be logged on a future date.
+ * AddExpenseActivity lets a parent log a new expense for a specific child:
+ * an amount, a date, a category picked from a dropdown, an optional receipt photo, and an optional description.
+ * The category dropdown shows the childs's savings categories
+ * the amount spent is deducted straight from whichever categoryit's recorded against
+ * It can never exceed what that category currently holds
+ * it can never be logged on a future date.
  */
 class AddExpenseActivity : AppCompatActivity() {
 
@@ -42,16 +42,16 @@ class AddExpenseActivity : AppCompatActivity() {
     private lateinit var spinnerCategory: Spinner
     private lateinit var ivReceiptPreview: ImageView
 
-    // Registered as a class property (rather than inside onCreate or a listener) because
-    // the system requires this call to happen before the Activity is STARTED - the
-    // callback lambda itself only actually runs later, once the user picks a photo
+    // Registered as a class property
+    // the system requires this call to happen before the Activity is started
+    // the callback lambda runs later once the user picks a photo
     // (Android Developers, n.d.).
     private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
             selectedPhotoUri = uri
 
-            // The photo picker only grants read access "until the app stops" by default -
-            // taking a persistable permission here means the photo is still viewable if
+            // The photo picker grants read access "until the app stops" by default
+            // it takes persistable permission meaning the photo is still viewable if
             // the user leaves this screen and comes back to it later (Android Developers, n.d.).
             contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
@@ -95,9 +95,7 @@ class AddExpenseActivity : AppCompatActivity() {
             ).show()
         }
 
-        // Opens Android's own Photo Picker screen, restricted to images only - this needs
-        // no storage permission at all, unlike older ways of picking a gallery image
-        // (Android Developers, n.d.).
+        // Opens Android's own Photo Picker screen, restricted to images only
         btnAddPhoto.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
@@ -129,9 +127,9 @@ class AddExpenseActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Zeroing out today's time fields the same way the picked date already is
-            // (see btnPickDate above) makes this a pure day-vs-day comparison, not one
-            // that depends on what time it happens to be right now (Gonzalez, 2025).
+            //todays time fields are zeroed out the same way the picked date is.
+            //this a pure day-vs-day comparison
+            // does not depend on what time it happens to be right now (Gonzalez, 2025).
             val todayMidnight = Calendar.getInstance()
             todayMidnight.set(Calendar.HOUR_OF_DAY, 0)
             todayMidnight.set(Calendar.MINUTE, 0)
@@ -145,8 +143,7 @@ class AddExpenseActivity : AppCompatActivity() {
 
             val selectedCategory = categories[categoryIndex]
 
-            // The cap: an expense can never draw more out of a category than it currently
-            // holds.
+            // The cap: an expense can never draw more out of a category than it currently holds.
             if (amount > selectedCategory.amountSaved) {
                 tvExpenseError.text = "That category only has %.2f available.".format(selectedCategory.amountSaved)
                 return@setOnClickListener
@@ -164,7 +161,7 @@ class AddExpenseActivity : AppCompatActivity() {
                     )
                 )
 
-                // Recording the expense deducts it from the category it was spent from -
+                // Recording the expense deducts it from the category it was spent from
                 // the same pattern CreateSavingsCategoryActivity uses for its source category.
                 database.savingsCategoryDao().update(
                     selectedCategory.copy(amountSaved = selectedCategory.amountSaved - amount)
@@ -176,8 +173,8 @@ class AddExpenseActivity : AppCompatActivity() {
         }
     }
 
-    // Reloads categories (and their current amounts) every time this screen becomes
-    // visible, so the cap check always reflects up-to-date figures (Android Developers, 2026).
+    // Reloads categories (and their current amounts) every time this screen becomes visible
+    //the cap check always reflects up-to-date figures (Android Developers, 2026).
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
@@ -206,7 +203,7 @@ class AddExpenseActivity : AppCompatActivity() {
 // GeeksforGeeks, 2019. Spinner in Kotlin [Webpage]. Available at:
 //     https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 13 September 2026].
 // Gonzalez, M.L., 2025. Get Date Without Time in Java [Webpage]. Available at:
-//     https://www.baeldung.com/java-date-without-time [Accessed 15 September 2026].
+//     https://www.baeldung.com/java-date-without-time [Accessed 13 September 2026].
 // Android Developers, n.d. Select photos and videos with the photo picker [Webpage].
 //     Available at: <https://developer.android.com/training/data-storage/shared/photopicker>
-//     [Accessed 15 September 2026].
+//     [Accessed 14 September 2026].

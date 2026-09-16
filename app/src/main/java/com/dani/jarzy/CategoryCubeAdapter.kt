@@ -11,12 +11,12 @@ import com.dani.jarzy.data.SavingsCategory
 
 /**
  * Backs the swipeable category cards on the "Categories" tab of both ChildDetailActivity
- * (the parent's per-child view) and ChildHomeActivity (the child's own home screen) -
- * shown inside a ViewPager2, which uses a RecyclerView.Adapter under the hood just like a
- * plain RecyclerView would. One coloured "cube" per savings category, cycling through
- * a small fixed palette from colors.xml so categories are easy to tell apart while
- * swiping - there's no per-category colour stored in the database, this is purely a
- * display detail (Android Developers, n.d.).
+ * (the parent's per-child view) and ChildHomeActivity (the child's own home screen)
+ * this is shown inside a ViewPager2, which uses a RecyclerView.Adapter under the hood like a
+ * plain RecyclerView would.
+ * One coloured "cube" per savings category, cycling through
+ * a small fixed palette from colors.xml so categories are easy to tell apart while swiping
+ *
  */
 class CategoryCubeAdapter(
     private var categories: List<SavingsCategory>
@@ -37,17 +37,16 @@ class CategoryCubeAdapter(
         val tvAmount: TextView = view.findViewById(R.id.tvCubeAmount)
     }
 
-    // Swaps in a freshly-loaded category list and redraws every visible card - called by
-    // both activities' refresh functions whenever the underlying data changes, the same
-    // "reload then redisplay" pattern used everywhere else in this app.
+    // Swaps in a freshly-loaded category list and redraws every visible card
+    // called by both activities' refresh functions whenever the underlying data changes
+    // the same "reload then redisplay" pattern used everywhere else in this app.
     fun updateCategories(newCategories: List<SavingsCategory>) {
         categories = newCategories
         notifyDataSetChanged()
     }
 
-    // Lets either activity turn "whichever cube the user last swiped to" (a plain
-    // ViewPager2.currentItem position) back into the actual category it represents, for
-    // the Edit/Delete Category buttons below the pager.
+    // Lets either activity turn "whichever cube the user last swiped to" back into the actual
+    // category it represents for the Edit/Delete Category buttons below the pager.
     fun categoryAt(position: Int): SavingsCategory? = categories.getOrNull(position)
 
     override fun getItemCount(): Int = categories.size

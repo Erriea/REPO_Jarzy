@@ -16,10 +16,8 @@ interface ChildDao {
     @Insert
     suspend fun insert(child: ChildAccount): Long
 
-    // Update and Delete return Int (the number of rows affected) instead of the more
-    // natural Unit.
-    // Android Developers (n.d.-b) shows the normal @Update pattern
-    // KSP2 (the compiler plugin Room uses to generate code)
+    // Update and Delete return Int (the number of rows affected) instead of the more natural Unit.
+    // Android Developers (n.d.-b) shows the normal @Update pattern KSP2 (the compiler plugin Room uses to generate code)
     // has a confirmed bug that crashes on suspend functions returning Unit specifically.
     // Google (n.d.) documents this bug, and returning Int instead avoids it entirely.
     @Update

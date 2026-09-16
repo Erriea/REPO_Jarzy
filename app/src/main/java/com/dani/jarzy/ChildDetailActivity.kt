@@ -35,19 +35,18 @@ private enum class DetailTab {
 
 /**
  * ChildDetailActivity is opened from ParentHomeActivity when the parent picks one of
- * their children from the dropdown. Everything on this screen is scoped to that ONE
- * child, and everything the parent set up when registering this child - username,
- * password, monthly allowance, min/max monthly spend, and their savings categories - can
- * be edited here. The parent can no longer log an expense for the child from this screen;
- * that's a child-only action now (see ChildHomeActivity), so this screen only offers a
- * quick summary and a link to the full "View Expense History" for that side of things.
+ * their children from the dropdown.
+ * Everything on this screen is scoped to that one child
+ * everything the parent set up when registering this child
+ * username, password, monthly allowance, min/max monthly spend, and their savings categories
+ * can be edited here.
  *
  * The screen is organised into three tabs (Stats / Categories / History) instead of one
- * long form, inspired by an app the user showed as a reference: Stats holds the child's
- * balance/budget/min-max figures plus the profile-editing fields; Categories shows every
- * savings category as a swipeable coloured "cube" (via vpCategories, a ViewPager2) with
- * Edit/Add New/Delete acting on whichever cube is currently centred; History shows a
- * quick per-category total with a button through to the full expense history screen.
+ * long form
+ * Stats holds the child's balance/budget/min-max figures plus the profile-editing fields
+ * Categories shows every savings category as a swipeable coloured "cube" with
+ * Edit/Add New/Delete acting on whichever cube is currently centred
+ * History shows a quick per-category total with a button through to the full expense history screen.
  */
 class ChildDetailActivity : AppCompatActivity() {
 
@@ -58,7 +57,7 @@ class ChildDetailActivity : AppCompatActivity() {
     // button has the current childId/primary key to copy() from, without re-fetching it.
     private var currentChild: ChildAccount? = null
 
-    // This child's savings categories, in the same order the cube carousel shows them -
+    // This child's savings categories, in the same order the cube carousel shows them
     // kept around so Edit/Delete Category can turn "whichever cube is on screen right
     // now" back into the actual category it represents.
     private var categories: List<SavingsCategory> = emptyList()
@@ -95,7 +94,8 @@ class ChildDetailActivity : AppCompatActivity() {
 
         database = JarzyDatabase.getDatabase(this)
 
-        // Both extras are read once here - the id for every database call on this
+        // Both extras are read once here
+        // the id for every database call on this
         // screen, the username just for display in the heading (Vogel, 2016).
         childId = intent.getLongExtra("CHILD_ID", -1L)
         val childUsername = intent.getStringExtra("CHILD_USERNAME") ?: ""
@@ -133,8 +133,6 @@ class ChildDetailActivity : AppCompatActivity() {
         llCategoriesTabContent = findViewById(R.id.llCategoriesTabContent)
         llHistoryTabContent = findViewById(R.id.llHistoryTabContent)
 
-        // Names the specific child so this page can't be confused with
-        // ParentHomeActivity's own "Welcome, <parent>" heading.
         tvChildDetailHeading.text = "Managing: $childUsername"
 
         btnBack.setOnClickListener { finish() }
@@ -144,10 +142,7 @@ class ChildDetailActivity : AppCompatActivity() {
         btnTabHistory.setOnClickListener { selectTab(DetailTab.HISTORY) }
         selectTab(DetailTab.STATS)
 
-        // The swipeable category carousel - offscreenPageLimit keeps the neighbouring
-        // cube already laid out (rather than blank) as it's swiped into view, and
-        // MarginPageTransformer opens a small gap between cubes on top of the peek
-        // effect the ViewPager2's own padding + clipToPadding="false" already create
+        // The swipeable category carousel
         // (Tutorialspoint, n.d.-c; Android Developers, n.d.-c).
         vpCategories = findViewById(R.id.vpCategories)
         categoryCubeAdapter = CategoryCubeAdapter(categories)
@@ -156,10 +151,10 @@ class ChildDetailActivity : AppCompatActivity() {
         vpCategories.setPageTransformer(MarginPageTransformer((8 * resources.displayMetrics.density).toInt()))
 
         // Shows/hides the whole "Edit Child Account" block instead of it always being on
-        // screen - the read-only summary above (Balance/Budget/Min/Max) covers most
+        // screen
+        // the read-only summary above (Balance/Budget/Min/Max) covers most
         // visits to this page, so the edit fields only need to appear when asked for
-        // (View.GONE removes a view from layout entirely, unlike View.INVISIBLE which
-        // would still leave an empty gap) (Android Developers, n.d.-a).
+        //(Android Developers, n.d.-a).
         btnToggleEditProfile.setOnClickListener {
             if (llEditAccountFields.visibility == View.VISIBLE) {
                 llEditAccountFields.visibility = View.GONE
@@ -225,9 +220,9 @@ class ChildDetailActivity : AppCompatActivity() {
             }
 
             lifecycleScope.launch {
-                // Username has to stay unique across every child - but this child is
-                // allowed to keep ITS OWN existing username, so only block the save if a
-                // DIFFERENT child already has it.
+                // Username has to stay unique across every child
+                // but this child is allowed to keep its own existing username
+                // only blocks the save if a different child already has it.
                 val existing = database.childDao().getByUsername(username)
                 if (existing != null && existing.childId != child.childId) {
                     tvAccountEditError.text = "That username is already taken by another account."
@@ -257,8 +252,7 @@ class ChildDetailActivity : AppCompatActivity() {
         }
 
         // Lets the parent give the child some extra money whenever they want, on top of
-        // whatever the allowance already set up at registration - any amount they choose,
-        // not tied to the stored monthlyAllowance figure at all.
+        // whatever the allowance already set up at registration
         btnAddToBalance.setOnClickListener {
             val amount = etAddBalanceAmount.text.toString().trim().toDoubleOrNull()
             if (amount == null || amount <= 0) {
@@ -269,8 +263,8 @@ class ChildDetailActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 val existingCategories = database.savingsCategoryDao().getCategoriesForChild(childId)
 
-                // Extra money always lands in the child's "General" category first - the
-                // child decides how to split it up further from there.
+                // Extra money always lands in the child's "General" category first
+                // the child decides how to split it up further from there.
                 val generalCategory = existingCategories.firstOrNull { it.name.equals("General", ignoreCase = true) }
 
                 if (generalCategory != null) {
@@ -289,8 +283,7 @@ class ChildDetailActivity : AppCompatActivity() {
             }
         }
 
-        // "Add New Category" always means creating a brand new one, from a blank popup -
-        // this button doesn't touch whatever cube is currently on screen at all.
+        // "Add New Category" always means creating a brand new one from a blank popup
         btnSaveCategory.setOnClickListener {
             showCategoryDialog(title = "Add New Category", existingName = "", existingAmount = "0.0") { name, amount ->
                 if (categories.any { it.name.equals(name, ignoreCase = true) }) {
@@ -335,8 +328,8 @@ class ChildDetailActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // A child always needs at least one category to exist, so the very last one
-            // can't be deleted here - the same invariant registration relies on.
+            // A child always needs at least one category to exist
+            // last one can't be deleted here
             if (categories.size <= 1) {
                 Toast.makeText(
                     this,
@@ -346,10 +339,9 @@ class ChildDetailActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // "General" is where a deleted category's funds land (see the confirmation
-            // handler below) - if General itself were deletable there'd be nowhere for
-            // that redirect to go, so it's protected here instead of handling that as a
-            // special case every time something else is deleted.
+            // "General" is where a deleted category's funds land
+            // if General itself were deletable there'd be nowhere for
+            // that redirect to go,
             if (selected.name.equals("General", ignoreCase = true)) {
                 Toast.makeText(
                     this,
@@ -359,9 +351,10 @@ class ChildDetailActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // A plain confirmation popup - Delete is destructive and can't be undone, so
+            // A plain confirmation popup
+            // Delete is destructive and can't be undone, so
             // it gets a "are you sure?" step the other two buttons don't need
-            // (Android Developers, n.d.-b).
+            // (Android Developers, n.d.).
             AlertDialog.Builder(this)
                 .setTitle("Delete Category")
                 .setMessage("Delete \"${selected.name}\"? Any money in it will move to General first.")
@@ -377,9 +370,9 @@ class ChildDetailActivity : AppCompatActivity() {
                                     generalCategory.copy(amountSaved = generalCategory.amountSaved + selected.amountSaved)
                                 )
                             } else {
-                                // Defensive fallback - every child should already have a
-                                // General category, but create one if it's somehow missing
-                                // rather than silently losing this money.
+                                // Defensive fallback
+                                // every child should already have a General category
+                                //  create one if it's somehow missing
                                 database.savingsCategoryDao().insert(
                                     SavingsCategory(childId = childId, name = "General", amountSaved = selected.amountSaved)
                                 )
@@ -402,7 +395,7 @@ class ChildDetailActivity : AppCompatActivity() {
         }
     }
 
-    // Runs on first open AND whenever this screen is returned to, so every figure and
+    // Runs on first open & whenever this screen is returned to so every figure and
     // field shown is never stale (Android Developers, 2026).
     override fun onResume() {
         super.onResume()
@@ -410,7 +403,8 @@ class ChildDetailActivity : AppCompatActivity() {
     }
 
     // Switches which of the three content blocks is visible and restyles the three tab
-    // buttons to match - pulled into its own function since it runs both from each
+    // buttons to match
+    // pulled into its own function since it runs both from each
     // button's click listener and once up front in onCreate() to set the initial state.
     private fun selectTab(tab: DetailTab) {
         currentTab = tab
@@ -424,9 +418,6 @@ class ChildDetailActivity : AppCompatActivity() {
         styleTabButton(btnTabHistory, tab == DetailTab.HISTORY)
     }
 
-    // The selected tab is filled white with blue text (matching every other primary
-    // button in this app); the other two stay outlined - transparent fill, white text -
-    // so there's always exactly one obviously "on" button in the row.
     private fun styleTabButton(button: MaterialButton, selected: Boolean) {
         if (selected) {
             button.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
@@ -438,7 +429,7 @@ class ChildDetailActivity : AppCompatActivity() {
     }
 
     // Shared by "Add New Category" and "Edit Category" - both need the exact same popup
-    // (a name box and an amount box), just with different starting text and a different
+    //  just with different starting text and a different
     // action once confirmed, so the actual name/amount validation and the onConfirm
     // callback are the only things that differ between the two buttons
     // (Android Developers, n.d.-b).

@@ -8,9 +8,7 @@ import androidx.room.PrimaryKey
 //Room entity representing one child's login, allowance and spending limits.
 // Android Developers (n.d.) explains how @Entity classes map to tables, and the same
 // idea is walked through step by step in CodingSTUFF's (2024) Room tutorial.
-// NOTE: there used to be a savingsBalance field here - it's been removed. A child's total
-// savings is now always calculated as the sum of their own SavingsCategory rows (via
-// SavingsCategoryDao.getCategoriesForChild), so there's only ever one source of truth.
+
 @Entity(
     tableName = "child_accounts",
     indices = [

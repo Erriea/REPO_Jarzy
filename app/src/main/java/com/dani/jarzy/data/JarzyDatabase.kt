@@ -33,10 +33,6 @@ abstract class JarzyDatabase : RoomDatabase() {
                     JarzyDatabase::class.java,
                     "jarzy_database"
                 )
-                    // There's no real user data to preserve in this prototype, and no
-                    // migration path has been written for the version 1 -> 2 change above -
-                    // without this, Room would crash on launch instead of just rebuilding
-                    // the database fresh (Android Developers, n.d.).
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
@@ -58,5 +54,5 @@ abstract class JarzyDatabase : RoomDatabase() {
 // Database Tutorial for Android - Part 1 [Video].
 // Available at: <https://www.youtube.com/watch?v=r_UfOz3yaLg> [Accessed 12 September 2026].
 // Android Developers, n.d. RoomDatabase.Builder [Webpage]. Available at:
-//     <https://developer.android.com/reference/kotlin/androidx/room/RoomDatabase.Builder>
-//     [Accessed 16 September 2026].
+// <https://developer.android.com/reference/kotlin/androidx/room/RoomDatabase.Builder>
+// [Accessed 16 September 2026].
