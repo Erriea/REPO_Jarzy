@@ -342,31 +342,41 @@ class ExpenseHistoryActivity : AppCompatActivity() {
 // References:
 // Android Developers, 2026. The activity lifecycle [Webpage]. Available at:
 //     https://developer.android.com/guide/components/activities/activity-lifecycle
-//     [Accessed 15 September 2026].
-// Tutorialspoint, n.d.-a. Kotlin Array - sumOf() Function [Webpage]. Available at:
+//     [Accessed 8 September 2026].
+
+// Tutorialspoint, 2026.-a. Kotlin Array - sumOf() Function [Webpage]. Available at:
 //     https://www.tutorialspoint.com/kotlin/kotlin_array_sumof_function.htm
-//     [Accessed 15 September 2026].
-// Tutorialspoint, n.d.-b. Kotlin Array - groupBy() Function [Webpage]. Available at:
+//     [Accessed 10 September 2026].
+
+// Tutorialspoint, 2026.-b. Kotlin Array - groupBy() Function [Webpage]. Available at:
 //     https://www.tutorialspoint.com/kotlin/kotlin_array_groupby_function.htm
-//     [Accessed 15 September 2026].
+//     [Accessed 10 September 2026].
+
 // Pajgade, A., 2025. Working with date objects in Kotlin [Webpage]. Available at:
 //     https://medium.com/@atharvapajgade/working-with-date-objects-in-kotlin-e6af6cb9688c
-//     [Accessed 15 September 2026].
+//     [Accessed 12 September 2026].
+
 // Chavan, D., 2023. Date Picker Using Kotlin in Android Studio | DatePickerDialog -
-//     Android Studio Tutorial | Kotlin [Webpage]. Available at:
-//     https://devendrac706.medium.com/date-picker-using-kotlin-in-android-studio-datepickerdialog-android-studio-tutorial-kotlin-3bbc606585a
-//     [Accessed 16 September 2026].
-// Android Developers, n.d.-a. DatePicker [Webpage]. Available at:
-//     https://developer.android.com/reference/android/widget/DatePicker [Accessed 16 September 2026].
-// Kotlin, n.d. associateBy [Webpage]. Available at:
-//     https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/associate-by.html
-//     [Accessed 16 September 2026].
-// Android Developers, n.d.-b. ViewGroup - removeAllViews() [Webpage]. Available at:
+// Android Studio Tutorial | Kotlin [Webpage].
+//Available at: https://devendrac706.medium.com/date-picker-using-kotlin-in-android-studio-datepickerdialog-android-studio-tutorial-kotlin-3bbc606585a
+// [Accessed 11 September 2026].
+
+// Android Developers, 2026. DatePicker [Webpage].
+// Available at: https://developer.android.com/reference/android/widget/DatePicker
+// [Accessed 14 September 2026].
+
+// Kotlin, n.d. associateBy [Webpage].
+// Available at: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/associate-by.html
+// [Accessed 13 September 2026].
+
+// Android Developers, 2026.-b. ViewGroup - removeAllViews() [Webpage]. Available at:
 //     https://developer.android.com/reference/android/view/ViewGroup#removeAllViews()
-//     [Accessed 17 September 2026].
-// Android Developers, n.d.-c. AlertDialog.Builder [Webpage]. Available at:
+//     [Accessed 13 September 2026].
+
+// Android Developers, 2026.-c. AlertDialog.Builder [Webpage]. Available at:
 //     https://developer.android.com/reference/android/app/AlertDialog.Builder
-//     [Accessed 17 September 2026].
-// Android Developers, n.d.-d. ResourcesCompat [Webpage]. Available at:
+//     [Accessed 15 September 2026].
+
+// Android Developers, 2026.-d. ResourcesCompat [Webpage]. Available at:
 //     https://developer.android.com/reference/androidx/core/content/res/ResourcesCompat
-//     [Accessed 16 September 2026].
+//     [Accessed 14 September 2026].
