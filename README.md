@@ -37,4 +37,7 @@ Jarzy is an Android budgeting app built for parents and their kids to use togeth
 
 ## Developers
 
-*(To be filled in.)*
+- *Danielle Poulton ST10440070 - Lead Programmer*
+- *Giselle Khan ST10447061 - Secondary Programmer*
+- *Ivan Willaims ST10439493 - UI Designer*
+
