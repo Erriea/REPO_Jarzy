@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The white rounded "jar" card behind the login form's placeholder graphic - stands in
+     for the jar photo until one is provided, at which point this can be swapped for an
+     ImageView showing the real picture. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/white" />
+    <corners android:radius="28dp" />
+</shape>

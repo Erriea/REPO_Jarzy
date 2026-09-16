@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Base shape for a category "cube" card on ChildDetailActivity's Categories tab - a
+     plain rounded rectangle whose fill colour gets swapped per item at runtime (see
+     CategoryCubeAdapter), cycling through a small palette so categories are easy to tell
+     apart while swiping. The colour set here is just a fallback before that swap happens. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/cube_green" />
+    <corners android:radius="24dp" />
+</shape>

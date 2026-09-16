@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Used by ChildHomeActivity's Save/Edit Category popups - unlike the parent's
+     dialog_category_input.xml, this only asks for a name. A child's category amount can
+     only ever change through an expense or the money-transfer screen, never typed in
+     here. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <EditText
+        android:id="@+id/etDialogCategoryName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Category name"
+        android:inputType="text" />
+
+</LinearLayout>

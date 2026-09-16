@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reusable white top bar showing the "JARZY" wordmark and its dot accent - pulled out
+     of activity_main.xml so every restyled screen can include this exact same header via
+     <include> instead of copy-pasting the same markup onto each one. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:orientation="horizontal"
+    android:background="@color/white"
+    android:gravity="center"
+    android:elevation="2dp">
+
+    <TextView
+        android:fontFamily="@font/comic_relief_bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="JARZY"
+        android:textSize="30sp"
+        android:textColor="@color/jarzy_blue"
+        android:letterSpacing="0.05" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="8dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/shape_dot"
+                android:layout_marginEnd="4dp" />
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/shape_dot" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/shape_dot"
+                android:layout_marginEnd="4dp" />
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/shape_dot" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

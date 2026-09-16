@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One small dot used in the 2x2 cluster next to the "JARZY" wordmark - a plain
+     decorative accent, not tied to any real logo asset. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/jarzy_blue" />
+    <size
+        android:width="8dp"
+        android:height="8dp" />
+</shape>

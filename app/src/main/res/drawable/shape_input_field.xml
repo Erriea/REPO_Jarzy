@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Light rounded background for the username/password fields on the login screen,
+     matching the pale grey input boxes in the inspiration image instead of the plain
+     underline EditText style used everywhere else in the app so far. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#EDEDED" />
+    <corners android:radius="8dp" />
+</shape>

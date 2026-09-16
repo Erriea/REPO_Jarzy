@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Row layout for the "Select a Child" spinner (both the closed view and the dropdown
+     list use this) - just a bigger TextView than the system default, to match how much
+     larger the rest of this screen's text now is. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:textSize="24sp"
+    android:textColor="@color/black" />

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reused by both the "Save Category" (add new) and "Edit Category" (change selected)
+     dialogs in ChildDetailActivity - inflated once per dialog, pre-filled with the
+     selected category's values for Edit, left blank for Save. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <EditText
+        android:id="@+id/etDialogCategoryName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Category name"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/etDialogCategoryAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Amount saved"
+        android:inputType="numberDecimal"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

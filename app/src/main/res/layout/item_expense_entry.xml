@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One row per expense in ExpenseHistoryActivity's "All Entries" view - inflated once
+     per expense and added to llExpenseEntries in code, rather than declared here
+     individually, since the number of expenses isn't known until the database is read.
+     tvEntryText is white/Comic Relief so it stays readable now that this screen's
+     background is jarzy_blue instead of the default white. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <TextView
+        android:id="@+id/tvEntryText"
+        android:fontFamily="@font/comic_relief_regular"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="15sp"
+        android:textColor="@color/white" />
+
+    <!-- Hidden (visibility="gone") unless this expense actually has a photoUri - tapping
+         it opens the same photo full-size in a popup. -->
+    <ImageView
+        android:id="@+id/ivEntryThumbnail"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        android:contentDescription="Receipt photo thumbnail" />
+
+</LinearLayout>

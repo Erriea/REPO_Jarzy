@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The white rounded card behind the big Balance figure at the top of the Stats tab -
+     white on the blue body, the same "card" language already used for the login
+     screen's placeholder jar graphic. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/white" />
+    <corners android:radius="28dp" />
+</shape>
