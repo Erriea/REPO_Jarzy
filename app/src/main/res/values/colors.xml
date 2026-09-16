@@ -2,4 +2,21 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="jarzy_blue">#3D6FB4</color>
+
+    <!-- The child's own screens (ChildHomeActivity) use this instead of jarzy_blue for
+         their body background and pill-button text, so a child can tell their own screens
+         apart from the parent's at a glance - everything else (the shared white "JARZY"
+         toolbar, the white pill/card shapes) stays exactly the same on both. -->
+    <color name="jarzy_purple">#6A4C93</color>
+
+    <!-- Small fixed palette the category "cubes" cycle through on ChildDetailActivity's
+         Categories tab (see CategoryCubeAdapter) - purely a display detail, categories
+         don't store their own colour in the database. -->
+    <color name="cube_green">#4CAF50</color>
+    <color name="cube_orange">#FF9800</color>
+    <color name="cube_purple">#9C27B0</color>
+    <color name="cube_teal">#00BCD4</color>
+    <color name="cube_pink">#E91E63</color>
+    <color name="cube_amber">#FFC107</color>
 </resources>

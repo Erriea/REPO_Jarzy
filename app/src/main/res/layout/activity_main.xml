@@ -1,76 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Restyled to match the login-screen inspiration image the user provided: a white top
+     bar carrying the "JARZY" wordmark, and a blue body holding a placeholder "jar" graphic
+     (swap for the real jar photo once provided), the heading, and the login form. Every
+     view the Kotlin code looks up by id (rgLoginType, rbParent, rbChild, etUsername,
+     etPassword, btnLogin, tvError, btnGoToRegister) keeps that exact id and behaviour -
+     only how they look has changed. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Jarzy - Log In"
-        android:textSize="24sp"
-        android:layout_marginBottom="24dp" />
+    <!-- White top bar - shared with every other restyled screen via this one layout
+         file, instead of copy-pasting the same wordmark + dot-cluster markup onto
+         each screen individually. -->
+    <include layout="@layout/toolbar_jarzy_brand" />
 
-    <RadioGroup
-        android:id="@+id/rgLoginType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+    <!-- Blue body - wrapped in a ScrollView so the form never gets cut off on a small
+         screen, the same reasoning behind every other ScrollView in this app. -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/jarzy_blue">
 
-        <RadioButton
-            android:id="@+id/rbParent"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Parent"
-            android:checked="true" />
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:padding="24dp">
 
-        <RadioButton
-            android:id="@+id/rbChild"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Child"
-            android:layout_marginStart="24dp" />
+            <!-- Placeholder "jar" graphic - a white rounded card with a blue top band and
+                 a generic person glyph, standing in for the real jar photo. Once that
+                 photo is provided, this whole block can be swapped for a single
+                 ImageView. -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="8dp">
 
-    </RadioGroup>
+                <View
+                    android:layout_width="56dp"
+                    android:layout_height="18dp"
+                    android:background="@drawable/shape_login_card_lid" />
 
-    <EditText
-        android:id="@+id/etUsername"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Username"
-        android:inputType="text" />
+                <FrameLayout
+                    android:layout_width="180dp"
+                    android:layout_height="200dp"
+                    android:background="@drawable/shape_login_card_body"
+                    android:layout_marginTop="-6dp">
 
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:layout_marginTop="8dp" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="90dp"
+                        android:layout_gravity="top"
+                        android:background="@drawable/shape_login_card_top_band" />
 
-    <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Log In"
-        android:layout_marginTop="16dp" />
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="36dp"
+                        android:src="@drawable/ic_person_placeholder"
+                        android:contentDescription="Placeholder graphic - a jar photo will replace this" />
 
-    <TextView
-        android:id="@+id/tvError"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#D32F2F"
-        android:layout_marginTop="12dp" />
+                </FrameLayout>
 
-    <Button
-        android:id="@+id/btnGoToRegister"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Register as Parent"
-        android:layout_marginTop="24dp" />
+            </LinearLayout>
+
+            <TextView
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LOG IN"
+                android:textSize="28sp"
+                android:textColor="@color/white"
+                android:letterSpacing="0.05"
+                android:layout_marginTop="20dp" />
+
+            <RadioGroup
+                android:id="@+id/rgLoginType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="16dp">
+
+                <RadioButton
+                    android:id="@+id/rbParent"
+                    android:fontFamily="@font/comic_relief_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Parent"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    app:buttonTint="@color/white"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/rbChild"
+                    android:fontFamily="@font/comic_relief_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Child"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    app:buttonTint="@color/white"
+                    android:layout_marginStart="24dp" />
+
+            </RadioGroup>
+
+            <EditText
+                android:id="@+id/etUsername"
+                android:fontFamily="@font/comic_relief_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Username"
+                android:inputType="text"
+                android:background="@drawable/shape_input_field"
+                android:textColorHint="#777777"
+                android:textSize="16sp"
+                android:padding="14dp"
+                android:layout_marginTop="20dp" />
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:fontFamily="@font/comic_relief_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:background="@drawable/shape_input_field"
+                android:textColorHint="#777777"
+                android:textSize="16sp"
+                android:padding="14dp"
+                android:layout_marginTop="10dp" />
+
+            <Button
+                android:id="@+id/btnLogin"
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="LOG IN"
+                android:textSize="16sp"
+                android:textColor="@color/jarzy_blue"
+                app:backgroundTint="@color/white"
+                android:layout_marginTop="20dp" />
+
+            <TextView
+                android:id="@+id/tvError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#D32F2F"
+                android:textSize="14sp"
+                android:layout_marginTop="12dp" />
+
+            <!-- Now filled white, matching Log In, rather than the outlined style it
+                 started with - the two buttons are meant to look like a matching pair. -->
+            <Button
+                android:id="@+id/btnGoToRegister"
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Register as Parent"
+                android:textSize="16sp"
+                android:textColor="@color/jarzy_blue"
+                app:backgroundTint="@color/white"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

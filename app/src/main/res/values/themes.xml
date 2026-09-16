@@ -1,9 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme. Blue is now the app-wide default. -->
     <style name="Base.Theme.Jarzy" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/jarzy_blue</item>
     </style>
 
     <style name="Theme.Jarzy" parent="Base.Theme.Jarzy" />
+
+    <!-- Used only by the child's own screens (ChildHomeActivity,
+         CreateSavingsCategoryActivity, ExpenseHistoryActivity) so they keep looking
+         exactly as they do today - this is deliberately just the plain Material 3
+         default with nothing overridden, the same thing every screen was already
+         using before this change. -->
+    <style name="Theme.Jarzy.ChildScreens" parent="Theme.Material3.DayNight.NoActionBar" />
 </resources>

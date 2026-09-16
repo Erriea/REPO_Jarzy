@@ -1,61 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Restyled to match the rest of the app's blue/white/Comic Relief look (same
+     toolbar-include + blue ScrollView body pattern as activity_main.xml,
+     activity_parent_home.xml and activity_child_detail.xml). Start Date and End Date used
+     to be two Buttons chained together with ConstraintLayout constraints, which let them
+     size themselves independently and end up different heights whenever one date string
+     was slightly longer than the other. Giving them equal layout_weight fixed the WIDTH
+     mismatch, but not the height: "Start: 01 Sep 2026" is a couple of characters longer
+     than "End: 16 Sep 2026", so at an equal width the longer one could still wrap onto a
+     second line while the shorter one stayed on one - same trick used to stop the
+     "Categories" tab button wrapping in activity_child_detail.xml: maxLines="1" plus a
+     smaller text size and tighter padding/insets, so neither button can wrap no matter
+     which date strings end up in them. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ExpenseHistoryActivity">
+    android:orientation="vertical"
+    android:background="@color/jarzy_blue">
 
-    <Button
-        android:id="@+id/btnBack"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Back"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp" />
-
-    <TextView
-        android:id="@+id/tvExpenseHistoryHeading"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Expense History"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/btnBack"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <TextView
-        android:id="@+id/tvExpenseHistoryTotal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/tvExpenseHistoryHeading"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+    <include layout="@layout/toolbar_jarzy_brand" />
 
     <ScrollView
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/tvExpenseHistoryTotal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="16dp">
+        android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/tvExpenseHistoryBreakdown"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <Button
+                android:id="@+id/btnBack"
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Back"
+                android:textSize="16sp"
+                android:textColor="@color/jarzy_blue"
+                app:backgroundTint="@color/white" />
+
+            <TextView
+                android:id="@+id/tvExpenseHistoryHeading"
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Expense History"
+                android:textSize="26sp"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/tvExpenseHistoryTotal"
+                android:fontFamily="@font/comic_relief_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:layout_marginTop="12dp" />
+
+            <!-- Both buttons are layout_width="0dp" + layout_weight="1" so they always
+                 split the row exactly evenly, whatever the two date strings say - this is
+                 what keeps them the same height as well as the same width. -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp">
+
+                <Button
+                    android:id="@+id/btnStartDate"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Start Date"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:minWidth="0dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:insetLeft="2dp"
+                    android:insetRight="2dp"
+                    android:textColor="@color/jarzy_blue"
+                    app:backgroundTint="@color/white"
+                    android:layout_marginEnd="6dp" />
+
+                <Button
+                    android:id="@+id/btnEndDate"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="End Date"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:minWidth="0dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:insetLeft="2dp"
+                    android:insetRight="2dp"
+                    android:textColor="@color/jarzy_blue"
+                    app:backgroundTint="@color/white"
+                    android:layout_marginStart="6dp" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnToggleView"
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="View: All Entries"
+                android:textSize="16sp"
+                android:textColor="@color/jarzy_blue"
+                app:backgroundTint="@color/white"
+                android:layout_marginTop="10dp" />
+
+            <!-- llExpenseEntries holds one row per expense (added in code by
+                 addExpenseRow()) for "All Entries"; tvExpenseHistoryBreakdown is the
+                 plain text list of totals for "Category Totals" - loadExpenseHistory()
+                 shows exactly one of the two at a time, never both. -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="20dp">
+
+                <LinearLayout
+                    android:id="@+id/llExpenseEntries"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/tvExpenseHistoryBreakdown"
+                    android:fontFamily="@font/comic_relief_regular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </ScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

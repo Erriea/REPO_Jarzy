@@ -36,19 +36,48 @@
         android:layout_marginTop="8dp" />
 
     <EditText
-        android:id="@+id/etMinGoal"
+        android:id="@+id/etMonthlyAllowance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Minimum monthly spending goal"
+        android:hint="Monthly allowance"
         android:inputType="numberDecimal"
         android:layout_marginTop="8dp" />
 
     <EditText
-        android:id="@+id/etMaxGoal"
+        android:id="@+id/etMinSpend"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Maximum monthly spending goal"
+        android:hint="Minimum monthly spend"
         android:inputType="numberDecimal"
+        android:layout_marginTop="8dp" />
+
+    <EditText
+        android:id="@+id/etMaxSpend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Maximum monthly spend"
+        android:inputType="numberDecimal"
+        android:layout_marginTop="8dp" />
+
+    <EditText
+        android:id="@+id/etCategoryName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter a savings category"
+        android:inputType="text"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnAddCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="+ Add Category"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/tvCategoriesAdded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp" />
 
     <Button

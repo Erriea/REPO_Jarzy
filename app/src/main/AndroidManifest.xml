@@ -36,6 +36,7 @@
         <activity
             android:name=".ChildHomeActivity"
             android:exported="false"
+            android:theme="@style/Theme.Jarzy.ChildScreens"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ChildDetailActivity"
@@ -48,6 +49,7 @@
         <activity
             android:name=".CreateSavingsCategoryActivity"
             android:exported="false"
+            android:theme="@style/Theme.Jarzy.ChildScreens"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ChildDetailActivity"
@@ -56,6 +58,7 @@
         <activity
             android:name=".ExpenseHistoryActivity"
             android:exported="false"
+            android:theme="@style/Theme.Jarzy.ChildScreens"
             android:windowSoftInputMode="adjustResize" />
     </application>
 

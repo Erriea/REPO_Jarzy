@@ -1,70 +1,299 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Reorganised to match ChildDetailActivity's three-tab layout (Stats / Categories /
+     History) with swipeable coloured "cube" cards instead of a plain category dropdown -
+     same structure as the parent's per-child view, just recoloured jarzy_purple instead
+     of jarzy_blue so the child's own screens are visually distinct from the parent's.
+     Every view the Kotlin code looks up by id keeps its existing id and behaviour;
+     spinnerCategories is the one exception - like on the parent's side, it's been
+     replaced by vpCategories (a ViewPager2) since the whole point is to swipe between
+     categories instead of picking one from a dropdown list. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChildHomeActivity">
+    android:orientation="vertical"
+    android:background="@color/jarzy_purple">
 
-    <TextView
-        android:id="@+id/tvChildWelcome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="Welcome"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp" />
+    <include layout="@layout/toolbar_jarzy_brand" />
 
-    <TextView
-        android:id="@+id/tvSavingsTotal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/tvChildWelcome"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+    <!-- Everything except Log Out lives in here, scrollable, so Log Out itself can sit
+         as its own sibling below and stay pinned to the bottom of the screen - the same
+         pattern activity_parent_home.xml uses for its own Log Out button. -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <TextView
-        android:id="@+id/tvSavingsBreakdown"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/tvSavingsTotal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
 
-    <Button
-        android:id="@+id/btnAddSavingsGoal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+ Add Savings Goal"
-        app:layout_constraintTop_toBottomOf="@id/tvSavingsBreakdown"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
+            <TextView
+                android:id="@+id/tvChildWelcome"
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Welcome"
+                android:textSize="28sp"
+                android:textColor="@color/white"
+                android:gravity="center" />
 
-    <Button
-        android:id="@+id/btnViewExpenseHistory"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="View Expense History"
-        app:layout_constraintTop_toBottomOf="@id/btnAddSavingsGoal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+            <!-- The three-way toggle - selectTab() in ChildHomeActivity.kt shows and hides
+                 the matching content block below and restyles these three buttons (filled
+                 white for whichever is selected, outlined for the other two) - identical
+                 mechanism to ChildDetailActivity's tab row on the parent's side. -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="24dp">
 
+                <Button
+                    android:id="@+id/btnTabStats"
+                    android:fontFamily="@font/comic_relief_bold"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Stats"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:minWidth="0dp"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:insetLeft="2dp"
+                    android:insetRight="2dp"
+                    app:strokeColor="@color/white"
+                    app:strokeWidth="2dp"
+                    android:layout_marginEnd="4dp" />
+
+                <Button
+                    android:id="@+id/btnTabCategories"
+                    android:fontFamily="@font/comic_relief_bold"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Categories"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:minWidth="0dp"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:insetLeft="2dp"
+                    android:insetRight="2dp"
+                    app:strokeColor="@color/white"
+                    app:strokeWidth="2dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp" />
+
+                <Button
+                    android:id="@+id/btnTabHistory"
+                    android:fontFamily="@font/comic_relief_bold"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="History"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:minWidth="0dp"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:insetLeft="2dp"
+                    android:insetRight="2dp"
+                    app:strokeColor="@color/white"
+                    app:strokeWidth="2dp"
+                    android:layout_marginStart="4dp" />
+
+            </LinearLayout>
+
+            <!-- ===================== STATS TAB ===================== -->
+            <LinearLayout
+                android:id="@+id/llStatsTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp">
+
+                <!-- Balance shown as one big white "cube" - the sum of every category,
+                     the same figure the old plain text version showed. -->
+                <FrameLayout
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/shape_cube_balance">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+
+                        <TextView
+                            android:fontFamily="@font/comic_relief_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Balance"
+                            android:textSize="18sp"
+                            android:textColor="@color/jarzy_purple" />
+
+                        <TextView
+                            android:id="@+id/tvSavingsTotal"
+                            android:fontFamily="@font/comic_relief_bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="34sp"
+                            android:textColor="@color/jarzy_purple"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                </FrameLayout>
+
+                <Button
+                    android:id="@+id/btnAddExpense"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Log an Expense"
+                    android:textSize="16sp"
+                    android:textColor="@color/jarzy_purple"
+                    app:backgroundTint="@color/white"
+                    android:layout_marginTop="24dp" />
+
+            </LinearLayout>
+
+            <!-- ===================== CATEGORIES TAB ===================== -->
+            <LinearLayout
+                android:id="@+id/llCategoriesTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp"
+                android:visibility="gone">
+
+                <!-- Swipe left/right to bring a different category's cube to the front -
+                     Edit Category and Delete Category below act on whichever cube is
+                     currently centred (ChildHomeActivity reads vpCategories.currentItem). -->
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/vpCategories"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:paddingStart="32dp"
+                    android:paddingEnd="32dp"
+                    android:clipToPadding="false"
+                    android:clipChildren="false" />
+
+                <Button
+                    android:id="@+id/btnEditCategory"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Edit Category"
+                    android:textSize="16sp"
+                    android:textColor="@color/jarzy_purple"
+                    app:backgroundTint="@color/white"
+                    android:layout_marginTop="16dp" />
+
+                <Button
+                    android:id="@+id/btnSaveCategory"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Add New Category"
+                    android:textSize="16sp"
+                    android:textColor="@color/jarzy_purple"
+                    app:backgroundTint="@color/white"
+                    android:layout_marginTop="10dp" />
+
+                <Button
+                    android:id="@+id/btnDeleteCategory"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delete Category"
+                    android:textSize="16sp"
+                    android:textColor="@color/jarzy_purple"
+                    app:backgroundTint="@color/white"
+                    android:layout_marginTop="10dp" />
+
+                <!-- Still its own button rather than folded into Edit/Delete above - it
+                     moves money that's already saved from one of the child's categories
+                     to another, which isn't really "editing" either one of them. -->
+                <Button
+                    android:id="@+id/btnAddSavingsGoal"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Move Money Between Categories"
+                    android:textSize="16sp"
+                    android:textColor="@color/jarzy_purple"
+                    app:backgroundTint="@color/white"
+                    android:layout_marginTop="20dp" />
+
+            </LinearLayout>
+
+            <!-- ===================== HISTORY TAB ===================== -->
+            <LinearLayout
+                android:id="@+id/llHistoryTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Category Totals"
+                    android:textSize="18sp"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:id="@+id/tvSavingsBreakdown"
+                    android:fontFamily="@font/comic_relief_regular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="8dp" />
+
+                <Button
+                    android:id="@+id/btnViewExpenseHistory"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="View Expense History"
+                    android:textSize="16sp"
+                    android:textColor="@color/jarzy_purple"
+                    app:backgroundTint="@color/white"
+                    android:layout_marginTop="20dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Log Out is deliberately outside the scrollable content above, so it stays pinned
+         to the bottom of the screen no matter which tab is showing. -->
     <Button
         android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
+        android:fontFamily="@font/comic_relief_bold"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Log Out"
-        app:layout_constraintTop_toBottomOf="@id/btnViewExpenseHistory"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:textSize="16sp"
+        android:textColor="@color/jarzy_purple"
+        app:backgroundTint="@color/white"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp" />
+
+</LinearLayout>

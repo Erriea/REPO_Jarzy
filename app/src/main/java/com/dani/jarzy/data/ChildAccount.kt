@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-//Room entity representing one child's login and spending goals.
+//Room entity representing one child's login, allowance and spending limits.
 // Android Developers (n.d.) explains how @Entity classes map to tables, and the same
 // idea is walked through step by step in CodingSTUFF's (2024) Room tutorial.
 // NOTE: there used to be a savingsBalance field here - it's been removed. A child's total
@@ -32,8 +32,9 @@ data class ChildAccount(
     val parentId: Long, //links parent to child
     val username: String, //unique
     val password: String, //stored as plain text for now
-    val minMonthlyGoal: Double = 0.0, // lower bounds of child's monthly spending
-    val maxMonthlyGoal: Double = 0.0 //upper bounds of child's monthly spending
+    val monthlyAllowance: Double = 0.0, // how much the parent gives this child each month
+    val minMonthlySpend: Double = 0.0, // lower bound of the child's monthly spending
+    val maxMonthlySpend: Double = 0.0 //upper bound of the child's monthly spending
 )
 
 // References:

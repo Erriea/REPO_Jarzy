@@ -77,11 +77,18 @@ class ParentHomeActivity : AppCompatActivity() {
         lifecycleScope.launch {
             children = database.childDao().getChildrenForParent(parentId)
             val usernames = children.map { it.username }
-            spinnerChildren.adapter = ArrayAdapter(
+
+            // item_spinner_text is a custom row layout (just a bigger TextView) used for
+            // both the closed spinner and its dropdown list, so the child names read at
+            // the same larger size as the rest of this screen's text - the system
+            // default row layout used before this was noticeably smaller.
+            val adapter = ArrayAdapter(
                 this@ParentHomeActivity,
-                android.R.layout.simple_spinner_dropdown_item,
+                R.layout.item_spinner_text,
                 usernames
             )
+            adapter.setDropDownViewResource(R.layout.item_spinner_text)
+            spinnerChildren.adapter = adapter
         }
     }
 }

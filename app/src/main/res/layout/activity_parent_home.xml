@@ -1,43 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Restyled to match the login screen - the same shared white "JARZY" top bar, a blue
+     body, and the same white pill buttons and Comic Relief fonts. Every view the Kotlin
+     code looks up by id (tvWelcome, btnRegisterChild, spinnerChildren, btnViewChild,
+     btnLogout) keeps that exact id and behaviour - only how they look has changed. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
+    android:background="@color/jarzy_blue">
 
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome, Parent"
-        android:textSize="24sp"
-        android:layout_marginBottom="24dp" />
+    <include layout="@layout/toolbar_jarzy_brand" />
 
-    <Button
-        android:id="@+id/btnRegisterChild"
+    <!-- Everything except Log Out lives in here, scrollable, so Log Out itself can sit
+         as its own sibling below and stay pinned to the bottom of the screen instead of
+         just being the last item in the scrolling list. -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Register a Child Account" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <Spinner
-        android:id="@+id/spinnerChildren"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
 
-    <Button
-        android:id="@+id/btnViewChild"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="View Selected Child"
-        android:layout_marginTop="16dp" />
+            <TextView
+                android:id="@+id/tvWelcome"
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Welcome, Parent"
+                android:textSize="38sp"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:letterSpacing="0.03"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="28dp" />
 
+            <Button
+                android:id="@+id/btnRegisterChild"
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Register a Child Account"
+                android:textSize="24sp"
+                android:textColor="@color/jarzy_blue"
+                app:backgroundTint="@color/white" />
+
+            <TextView
+                android:fontFamily="@font/comic_relief_regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select a Child"
+                android:textSize="24sp"
+                android:textColor="@color/white"
+                android:layout_marginTop="24dp" />
+
+            <!-- White background now, with a small arrow drawn on top since a custom
+                 background replaces the native dropdown-style background the Spinner
+                 would otherwise use to show that arrow itself. -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
+
+                <Spinner
+                    android:id="@+id/spinnerChildren"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_input_field_white"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="36dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="14dp"
+                    android:text="▼"
+                    android:textColor="@color/jarzy_blue"
+                    android:textSize="18sp" />
+
+            </FrameLayout>
+
+            <Button
+                android:id="@+id/btnViewChild"
+                android:fontFamily="@font/comic_relief_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="View Selected Child"
+                android:textSize="24sp"
+                android:textColor="@color/jarzy_blue"
+                app:backgroundTint="@color/white"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Log Out is deliberately outside the scrollable content above, so it stays
+         pinned to the bottom of the screen instead of sitting directly under
+         View Selected Child. -->
     <Button
         android:id="@+id/btnLogout"
+        android:fontFamily="@font/comic_relief_bold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Log Out"
-        android:layout_marginTop="16dp" />
+        android:textSize="24sp"
+        android:textColor="@color/jarzy_blue"
+        app:backgroundTint="@color/white"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp" />
 
 </LinearLayout>
