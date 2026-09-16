@@ -96,12 +96,15 @@ class ParentHomeActivity : AppCompatActivity() {
 // References:
 // Android Developers, 2026. The activity lifecycle [Webpage]. Available at:
 //     https://developer.android.com/guide/components/activities/activity-lifecycle
-//     [Accessed 15 September 2026].
-// GeeksforGeeks, 2019. Spinner in Kotlin [Webpage]. Available at:
-//     https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 15 September 2026].
+//     [Accessed 8 September 2026].
+
+// GeeksforGeeks, 2025. Spinner in Kotlin [Webpage]. Available at:
+//     https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 14 September 2026].
+
 // Kumar, M., 2025. Mastering Android Launch Modes and Intent Flags: A Complete Developer
 //     Guide [Webpage]. Available at:
 //     https://medium.com/@manishkumar_75473/mastering-android-launch-modes-and-intent-flags-a-complete-developer-guide-f44d298e29c9
-//     [Accessed 15 September 2026].
+//     [Accessed 8 September 2026].
+
 // Vogel, L., 2016. Android Intents - Tutorial (Version 0.3) [Webpage]. Available at:
-//     https://www.vogella.com/tutorials/AndroidIntent/article.html [Accessed 15 September 2026].
+//     https://www.vogella.com/tutorials/AndroidIntent/article.html [Accessed 9 September 2026].

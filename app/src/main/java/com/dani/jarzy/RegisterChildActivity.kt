@@ -170,14 +170,16 @@ class RegisterChildActivity : AppCompatActivity() {
 
 // References:
 // Vogel, L., 2016. Android Intents - Tutorial (Version 0.3) [Webpage]. Available at:
-//     https://www.vogella.com/tutorials/AndroidIntent/article.html [Accessed 12 September 2026].
-// Tutorialspoint, n.d. Kotlin String - toDoubleOrNull() Function [Webpage]. Available at:
+//     https://www.vogella.com/tutorials/AndroidIntent/article.html [Accessed 9 September 2026].
+
+// Tutorialspoint, 2026. Kotlin String - toDoubleOrNull() Function [Webpage]. Available at:
 //     https://www.tutorialspoint.com/kotlin/kotlin_string_todoubleornull_function.htm
-//     [Accessed 12 September 2026].
-// Yuan, K., 2024. Password Validation in Kotlin [Webpage]. Available at:
-//     https://www.baeldung.com/kotlin/password-validation [Accessed 16 September 2026].
+//     [Accessed 8 September 2026].
+
+// Yuan, K., 2024. Password Validation in Kotlin [Webpage]. Available at: // https://www.baeldung.com/kotlin/password-validation [Accessed 16 September 2026].
+
 // Duggu, 2023. joinToString in Kotlin [Webpage]. Available at:
-//     https://medium.com/@dugguRK/jointostring-in-kotlin-d227b9394486 [Accessed 16 September 2026].
+//     https://medium.com/@dugguRK/jointostring-in-kotlin-d227b9394486 [Accessed 11 September 2026].
 // Kotlin, n.d. withIndex() [Webpage]. Available at:
 //     https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/with-index.html
-//     [Accessed 16 September 2026].
+//     [Accessed 13 September 2026].

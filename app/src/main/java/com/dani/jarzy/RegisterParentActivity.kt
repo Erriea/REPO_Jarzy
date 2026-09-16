@@ -83,8 +83,9 @@ class RegisterParentActivity : AppCompatActivity() {
 // References:
 // Android Developers, 2026. Toasts overview [Webpage]. Available at:
 //     https://developer.android.com/guide/topics/ui/notifiers/toasts [Accessed 12 September 2026].
+
 // Azhar, 2020. How to check if android editText is empty? [Webpage]. Available at:
 //     https://www.tutorialspoint.com/how-to-check-if-android-edittext-is-empty-in-kotlin
-//     [Accessed 12 September 2026].
-// Yuan, K., 2024. Password Validation in Kotlin [Webpage]. Available at:
-//     https://www.baeldung.com/kotlin/password-validation [Accessed 16 September 2026].
+//     [Accessed 15 September 2026].
+
+// Yuan, K., 2024. Password Validation in Kotlin [Webpage]. Available at: // https://www.baeldung.com/kotlin/password-validation [Accessed 16 September 2026].

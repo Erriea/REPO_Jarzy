@@ -119,12 +119,15 @@ class MainActivity : AppCompatActivity() {
 
 // References:
 //Kargopolov, S., 2017. RadioButton Example in Kotlin [Webpage]. Available at:
-//     https://www.appsdeveloperblog.com/radiobutton-example-kotlin/ [Accessed 15 September 2026].
+//     https://www.appsdeveloperblog.com/radiobutton-example-kotlin/ [Accessed 13 September 2026].
+
 // Vogel, L., 2016. Android Intents - Tutorial (Version 0.3) [Webpage]. Available at:
-//     https://www.vogella.com/tutorials/AndroidIntent/article.html [Accessed 12 September 2026].
+//     https://www.vogella.com/tutorials/AndroidIntent/article.html [Accessed 9 September 2026].
+
 // Zoha, A.H., 2019. Coroutine in Android: Working with Lifecycle [Webpage]. Available at:
 //     https://medium.com/android-news/coroutine-in-android-working-with-lifecycle-fc9c1a31e5f3
-//     [Accessed 12 September 2026].
-// GeeksforGeeks, 2019. What is Toast and How to Use it in Android with Examples? [Webpage].
+//     [Accessed 10 September 2026].
+
+// GeeksforGeeks, 2025. What is Toast and How to Use it in Android with Examples? [Webpage].
 //     Available at: https://www.geeksforgeeks.org/android/what-is-toast-and-how-to-use-it-in-android-with-examples/
 //     [Accessed 12 September 2026].
