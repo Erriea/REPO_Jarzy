@@ -42,6 +42,7 @@ data class SavingsCategory(
     val budgetSize: Double = 0.0
 )
 
+
 // References:
 // Android Developers, 2026. Define data using Room entities [Webpage].
 // Available at: <https://developer.android.com/training/data-storage/room/defining-data>
