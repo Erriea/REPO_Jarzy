@@ -23,4 +23,14 @@
         android:inputType="numberDecimal"
         android:layout_marginTop="8dp" />
 
+    <!-- Optional - 0 or blank means "no budget set", which skips the overspending check
+         entirely for this category (ChildDetailActivity/AddExpenseActivity). -->
+    <EditText
+        android:id="@+id/etDialogCategoryBudget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Monthly budget (optional)"
+        android:inputType="numberDecimal"
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>

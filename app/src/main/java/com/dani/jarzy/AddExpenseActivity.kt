@@ -45,14 +45,14 @@ class AddExpenseActivity : AppCompatActivity() {
     // Registered as a class property
     // the system requires this call to happen before the Activity is started
     // the callback lambda runs later once the user picks a photo
-    // (Android Developers, n.d.).
+    // (Android Developers, n.d.-a).
     private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
             selectedPhotoUri = uri
 
             // The photo picker grants read access "until the app stops" by default
             // it takes persistable permission meaning the photo is still viewable if
-            // the user leaves this screen and comes back to it later (Android Developers, n.d.).
+            // the user leaves this screen and comes back to it later (Android Developers, n.d.-a).
             contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
             ivReceiptPreview.visibility = View.VISIBLE
@@ -167,6 +167,52 @@ class AddExpenseActivity : AppCompatActivity() {
                     selectedCategory.copy(amountSaved = selectedCategory.amountSaved - amount)
                 )
 
+                // Overspending warning - separate from (and never blocks) the hard cap
+                // above, which stops an expense exceeding what's actually IN a category.
+                // budgetSize is a target the parent optionally sets for how much should be
+                // spent from this category in a month; going over it is still allowed
+                // (the money might genuinely be there), it just gets flagged so the parent
+                // notices. A budgetSize of 0 means no budget was set, so this check is
+                // skipped entirely for that category.
+                if (selectedCategory.budgetSize > 0) {
+                    val monthStart = Calendar.getInstance()
+                    monthStart.timeInMillis = dateMillis
+                    monthStart.set(Calendar.DAY_OF_MONTH, 1)
+                    monthStart.set(Calendar.HOUR_OF_DAY, 0)
+                    monthStart.set(Calendar.MINUTE, 0)
+                    monthStart.set(Calendar.SECOND, 0)
+                    monthStart.set(Calendar.MILLISECOND, 0)
+
+                    val monthEnd = Calendar.getInstance()
+                    monthEnd.timeInMillis = dateMillis
+                    monthEnd.set(Calendar.DAY_OF_MONTH, monthEnd.getActualMaximum(Calendar.DAY_OF_MONTH))
+                    monthEnd.set(Calendar.HOUR_OF_DAY, 23)
+                    monthEnd.set(Calendar.MINUTE, 59)
+                    monthEnd.set(Calendar.SECOND, 59)
+                    monthEnd.set(Calendar.MILLISECOND, 999)
+
+                    // getActualMaximum(Calendar.DAY_OF_MONTH) finds the last real day of
+                    // whichever month the expense falls in (28-31, correctly handling
+                    // February) rather than hardcoding 31 (Android Developers, n.d.-b).
+                    // getTotalsPerSavingsCategory already includes the expense just
+                    // inserted above, since it re-reads from the database rather than
+                    // using any value cached earlier in this function.
+                    val monthTotals = database.expenseDao()
+                        .getTotalsPerSavingsCategory(childId, monthStart.timeInMillis, monthEnd.timeInMillis)
+                    val spentThisMonth = monthTotals
+                        .firstOrNull { it.categoryId == selectedCategory.savingsCategoryId }
+                        ?.totalSpent ?: 0.0
+
+                    if (spentThisMonth > selectedCategory.budgetSize) {
+                        Toast.makeText(
+                            this@AddExpenseActivity,
+                            "Heads up: ${selectedCategory.name} is now %.2f over its %.2f monthly budget."
+                                .format(spentThisMonth - selectedCategory.budgetSize, selectedCategory.budgetSize),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
                 Toast.makeText(this@AddExpenseActivity, "Expense saved!", Toast.LENGTH_LONG).show()
                 finish()
             }
@@ -204,6 +250,9 @@ class AddExpenseActivity : AppCompatActivity() {
 //     https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 13 September 2026].
 // Gonzalez, M.L., 2025. Get Date Without Time in Java [Webpage]. Available at:
 //     https://www.baeldung.com/java-date-without-time [Accessed 13 September 2026].
-// Android Developers, n.d. Select photos and videos with the photo picker [Webpage].
+// Android Developers, n.d.-a. Select photos and videos with the photo picker [Webpage].
 //     Available at: <https://developer.android.com/training/data-storage/shared/photopicker>
 //     [Accessed 14 September 2026].
+// Android Developers, n.d.-b. Calendar.getActualMaximum(int) [Webpage]. Available at:
+//     https://developer.android.com/reference/java/util/Calendar#getActualMaximum(int)
+//     [Accessed 18 October 2026].

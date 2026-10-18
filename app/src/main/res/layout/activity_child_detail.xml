@@ -57,9 +57,12 @@
                 android:gravity="center"
                 android:layout_marginTop="4dp" />
 
-            <!-- The three-way toggle - selectTab() in ChildDetailActivity.kt shows and
-                 hides the matching content block below and restyles these three buttons
-                 (filled white for whichever is selected, outlined for the other two). -->
+            <!-- The four-way toggle - selectTab() in ChildDetailActivity.kt shows and
+                 hides the matching content block below and restyles these four buttons
+                 (filled white for whichever is selected, outlined for the other three).
+                 Quests was added as a functionality-first fourth tab rather than waiting
+                 for the full wallet/jar visual redesign - same tab mechanism, just one
+                 more button and content block. -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,16 +77,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Stats"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:maxLines="1"
                     android:minWidth="0dp"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:insetLeft="2dp"
-                    android:insetRight="2dp"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp"
+                    android:insetLeft="1dp"
+                    android:insetRight="1dp"
                     app:strokeColor="@color/white"
                     app:strokeWidth="2dp"
-                    android:layout_marginEnd="4dp" />
+                    android:layout_marginEnd="3dp" />
 
                 <Button
                     android:id="@+id/btnTabCategories"
@@ -93,17 +96,37 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Categories"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:maxLines="1"
                     android:minWidth="0dp"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:insetLeft="2dp"
-                    android:insetRight="2dp"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp"
+                    android:insetLeft="1dp"
+                    android:insetRight="1dp"
                     app:strokeColor="@color/white"
                     app:strokeWidth="2dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginEnd="4dp" />
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="3dp" />
+
+                <Button
+                    android:id="@+id/btnTabQuests"
+                    android:fontFamily="@font/comic_relief_bold"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Quests"
+                    android:textSize="11sp"
+                    android:maxLines="1"
+                    android:minWidth="0dp"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp"
+                    android:insetLeft="1dp"
+                    android:insetRight="1dp"
+                    app:strokeColor="@color/white"
+                    app:strokeWidth="2dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="3dp" />
 
                 <Button
                     android:id="@+id/btnTabHistory"
@@ -113,16 +136,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="History"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:maxLines="1"
                     android:minWidth="0dp"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:insetLeft="2dp"
-                    android:insetRight="2dp"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp"
+                    android:insetLeft="1dp"
+                    android:insetRight="1dp"
                     app:strokeColor="@color/white"
                     app:strokeWidth="2dp"
-                    android:layout_marginStart="4dp" />
+                    android:layout_marginStart="3dp" />
 
             </LinearLayout>
 
@@ -417,6 +440,63 @@
                     android:textColor="@color/jarzy_blue"
                     app:backgroundTint="@color/white"
                     android:layout_marginTop="10dp" />
+
+            </LinearLayout>
+
+            <!-- ===================== QUESTS TAB ===================== -->
+            <LinearLayout
+                android:id="@+id/llQuestsTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp"
+                android:visibility="gone">
+
+                <!-- "3 of 5 done today" - ChildDetailActivity.refreshQuests() fills this in
+                     from this child's quests that are active today (QuestScheduler). -->
+                <TextView
+                    android:id="@+id/tvQuestProgress"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+                <!-- Only enabled once every quest active today is checked off - tapping it
+                     pays every checked-but-unpaid quest's reward into General all at once. -->
+                <Button
+                    android:id="@+id/btnConfirmQuests"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Confirm &amp; Pay"
+                    android:textSize="16sp"
+                    android:textColor="@color/jarzy_blue"
+                    app:backgroundTint="@color/white"
+                    android:enabled="false"
+                    android:layout_marginTop="12dp" />
+
+                <!-- RecyclerView.Adapter chosen over the ViewPager2 "cube" style used for
+                     categories - a scrollable list reads better for a checklist than a
+                     swipeable carousel. -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvQuests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_marginTop="16dp" />
+
+                <Button
+                    android:id="@+id/btnAddQuest"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Add New Quest"
+                    android:textSize="16sp"
+                    android:textColor="@color/jarzy_blue"
+                    app:backgroundTint="@color/white"
+                    android:layout_marginTop="12dp" />
 
             </LinearLayout>
 

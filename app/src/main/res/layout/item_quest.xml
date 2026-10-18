@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One row in a child's quest checklist (QuestAdapter). Shown on both ChildHomeActivity
+     (the child ticks cbQuestDone) and ChildDetailActivity (the parent sees the same
+     checkbox read-only, plus btnQuestDelete, which QuestAdapter only makes visible in
+     its PARENT mode) - functionality-first styling, matching the plain white rounded
+     background already used for input fields elsewhere in the app rather than a custom
+     "jar" graphic, which is a visual-polish pass for later. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/shape_input_field_white"
+    android:padding="12dp"
+    android:layout_marginBottom="8dp">
+
+    <CheckBox
+        android:id="@+id/cbQuestDone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="8dp">
+
+        <TextView
+            android:id="@+id/tvQuestName"
+            android:fontFamily="@font/comic_relief_bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tvQuestMeta"
+            android:fontFamily="@font/comic_relief_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="#555555" />
+
+    </LinearLayout>
+
+    <!-- Only made visible by QuestAdapter when it's bound in PARENT mode - a child can
+         check a quest off but can't delete one outright, same permission split used
+         everywhere else in this app. -->
+    <Button
+        android:id="@+id/btnQuestDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        app:backgroundTint="#D32F2F"
+        android:visibility="gone" />
+
+</LinearLayout>

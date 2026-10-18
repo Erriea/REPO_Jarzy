@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reused by both "Add New Quest" and "Edit Quest" in ChildDetailActivity, the same way
+     dialog_category_input.xml is reused by Add/Edit Category - inflated once per dialog,
+     pre-filled with the selected quest's values for Edit, left at sensible defaults for
+     Add. Functionality-first styling (plain AlertDialog widgets), matching the rest of
+     the app's dialogs rather than the wireframe's custom popup look, which is a
+     visual-polish pass for later. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <EditText
+            android:id="@+id/etDialogQuestName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Quest name"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/etDialogQuestReward"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Reward (R)"
+            android:inputType="numberDecimal"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="How often?"
+            android:layout_marginTop="16dp" />
+
+        <RadioGroup
+            android:id="@+id/rgDialogQuestType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rbQuestOnceOff"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Once-off" />
+
+            <RadioButton
+                android:id="@+id/rbQuestDaily"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Daily" />
+
+            <RadioButton
+                android:id="@+id/rbQuestWeekly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Weekly" />
+
+        </RadioGroup>
+
+        <!-- Only shown when "Weekly" above is selected - toggled in ChildDetailActivity's
+             RadioGroup listener. -->
+        <Spinner
+            android:id="@+id/spinnerQuestWeekday"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnDialogPickStartDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pick Start Date"
+            android:layout_marginTop="16dp" />
+
+        <CheckBox
+            android:id="@+id/cbDialogNoEndDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No end date (keeps repeating)"
+            android:checked="true"
+            android:layout_marginTop="8dp" />
+
+        <!-- Only enabled once cbDialogNoEndDate above is unticked. -->
+        <Button
+            android:id="@+id/btnDialogPickEndDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pick End Date"
+            android:enabled="false"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+</ScrollView>

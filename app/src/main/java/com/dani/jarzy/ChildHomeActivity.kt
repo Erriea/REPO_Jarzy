@@ -14,33 +14,40 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.dani.jarzy.data.JarzyDatabase
+import com.dani.jarzy.data.Quest
 import com.dani.jarzy.data.SavingsCategory
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
-// The three views this screen can show, swapped by the top tab row instead of one long
+// The four views this screen can show, swapped by the top tab row instead of one long
 // scrolling form - the exact same enum/selectTab()/styleTabButton() pattern
 // ChildDetailActivity uses for the parent's per-child view (its DetailTab), just renamed
 // so the two screens' near-identical private enums don't read as the same type.
 private enum class ChildTab {
     STATS,
     CATEGORIES,
+    QUESTS,
     HISTORY
 }
 
 /**
  * ChildHomeActivity is the screen a child lands on after logging in. It's organised into
- * the same three tabs as the parent's ChildDetailActivity - Stats / Categories / History -
- * recoloured jarzy_purple instead of jarzy_blue so a child can tell their own screens
- * apart from the parent's at a glance. Stats shows the child's balance as one big cube
- * plus a way to log an expense; Categories shows every savings category as a swipeable
- * coloured cube (via vpCategories, a ViewPager2) with Add New/Edit/Delete acting on
- * whichever cube is currently centred, plus the money-transfer screen since that also
- * only ever moves money between categories; History shows a quick per-category total
- * with a button through to the full expense history screen.
+ * the same four tabs as the parent's ChildDetailActivity - Stats / Categories / Quests /
+ * History - recoloured jarzy_purple instead of jarzy_blue so a child can tell their own
+ * screens apart from the parent's at a glance. Stats shows the child's balance as one big
+ * cube plus a way to log an expense; Categories shows every savings category as a
+ * swipeable coloured cube (via vpCategories, a ViewPager2) with Add New/Edit/Delete
+ * acting on whichever cube is currently centred, plus the money-transfer screen since
+ * that also only ever moves money between categories; Quests is the child's side of the
+ * chore system - a checklist of whatever the parent has set up for them, where ticking a
+ * box marks it done but doesn't pay it (the parent still has to confirm); History shows a
+ * quick per-category total with a button through to the full expense history screen.
  *
  * Three safety differences apply only here, because it's the CHILD'S own money:
  *   - Add New Category always creates a brand-new category starting at 0 - there's no
@@ -49,11 +56,9 @@ private enum class ChildTab {
  *   - There's no "Add to Balance" field like the parent's Stats tab has - only the parent
  *     can give a child extra money.
  * The only ways money can actually enter or move between a child's categories are the
- * parent adding to their balance, logging an expense, or the "Move Money Between
- * Categories" transfer screen (which only ever shifts money that's already there from one
- * category to another, never creates it). Letting a child type a new amount directly into
- * a category here would bypass all of that, so that ability simply isn't offered on this
- * screen.
+ * parent adding to their balance, logging an expense, the "Move Money Between
+ * Categories" transfer screen, or the parent confirming a completed quest - none of
+ * which this screen lets a child short-circuit themselves.
  */
 class ChildHomeActivity : AppCompatActivity() {
 
@@ -65,6 +70,10 @@ class ChildHomeActivity : AppCompatActivity() {
     // right now" back into the actual category it represents.
     private var categories: List<SavingsCategory> = emptyList()
 
+    // This child's quests, already passed through QuestScheduler.resetIfNeeded() every
+    // time they're loaded - see refreshQuests().
+    private var quests: List<Quest> = emptyList()
+
     private var currentTab = ChildTab.STATS
 
     private lateinit var tvSavingsTotal: TextView
@@ -72,13 +81,19 @@ class ChildHomeActivity : AppCompatActivity() {
 
     private lateinit var btnTabStats: MaterialButton
     private lateinit var btnTabCategories: MaterialButton
+    private lateinit var btnTabQuests: MaterialButton
     private lateinit var btnTabHistory: MaterialButton
     private lateinit var llStatsTabContent: LinearLayout
     private lateinit var llCategoriesTabContent: LinearLayout
+    private lateinit var llQuestsTabContent: LinearLayout
     private lateinit var llHistoryTabContent: LinearLayout
 
     private lateinit var vpCategories: ViewPager2
     private lateinit var categoryCubeAdapter: CategoryCubeAdapter
+
+    private lateinit var tvQuestProgress: TextView
+    private lateinit var rvQuests: RecyclerView
+    private lateinit var questAdapter: QuestAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,10 +110,15 @@ class ChildHomeActivity : AppCompatActivity() {
 
         btnTabStats = findViewById(R.id.btnTabStats)
         btnTabCategories = findViewById(R.id.btnTabCategories)
+        btnTabQuests = findViewById(R.id.btnTabQuests)
         btnTabHistory = findViewById(R.id.btnTabHistory)
         llStatsTabContent = findViewById(R.id.llStatsTabContent)
         llCategoriesTabContent = findViewById(R.id.llCategoriesTabContent)
+        llQuestsTabContent = findViewById(R.id.llQuestsTabContent)
         llHistoryTabContent = findViewById(R.id.llHistoryTabContent)
+
+        tvQuestProgress = findViewById(R.id.tvQuestProgress)
+        rvQuests = findViewById(R.id.rvQuests)
 
         val btnSaveCategory = findViewById<Button>(R.id.btnSaveCategory)
         val btnEditCategory = findViewById<Button>(R.id.btnEditCategory)
@@ -113,6 +133,7 @@ class ChildHomeActivity : AppCompatActivity() {
 
         btnTabStats.setOnClickListener { selectTab(ChildTab.STATS) }
         btnTabCategories.setOnClickListener { selectTab(ChildTab.CATEGORIES) }
+        btnTabQuests.setOnClickListener { selectTab(ChildTab.QUESTS) }
         btnTabHistory.setOnClickListener { selectTab(ChildTab.HISTORY) }
         selectTab(ChildTab.STATS)
 
@@ -127,6 +148,20 @@ class ChildHomeActivity : AppCompatActivity() {
         vpCategories.adapter = categoryCubeAdapter
         vpCategories.offscreenPageLimit = 1
         vpCategories.setPageTransformer(MarginPageTransformer((8 * resources.displayMetrics.density).toInt()))
+
+        // QuestAdapter in CHILD mode - the checkbox is tappable (marks a quest done
+        // without paying it), and there's no Edit/Delete since only the parent can
+        // create, change or remove a quest (see ChildDetailActivity for the PARENT-mode
+        // version of this same adapter class).
+        questAdapter = QuestAdapter(
+            quests = quests,
+            mode = QuestAdapter.Mode.CHILD,
+            onCheckToggled = { quest, isChecked -> onQuestCheckToggled(quest, isChecked) }
+        )
+        // A plain vertical list - RecyclerView needs a LayoutManager told how to arrange
+        // its rows, unlike ViewPager2 above which supplies its own (Android Developers, n.d.-c).
+        rvQuests.layoutManager = LinearLayoutManager(this)
+        rvQuests.adapter = questAdapter
 
         // "Add New Category" always creates a brand-new one, starting at 0 - never with a
         // typed-in amount, so this button can't be used to give the child money that
@@ -264,14 +299,15 @@ class ChildHomeActivity : AppCompatActivity() {
     }
 
     // Runs on first open AND whenever this screen is returned to (e.g. after logging an
-    // expense, or coming back from the transfer screen), so the balance and category list
-    // are never stale.
+    // expense, or coming back from the transfer screen), so the balance, category list
+    // and quest checklist are never stale.
     override fun onResume() {
         super.onResume()
         refreshCategories()
+        lifecycleScope.launch { refreshQuests() }
     }
 
-    // Switches which of the three content blocks is visible and restyles the three tab
+    // Switches which of the four content blocks is visible and restyles the four tab
     // buttons to match - pulled into its own function since it runs both from each
     // button's click listener and once up front in onCreate() to set the initial state,
     // the same selectTab() ChildDetailActivity uses on the parent's side.
@@ -280,16 +316,18 @@ class ChildHomeActivity : AppCompatActivity() {
 
         llStatsTabContent.visibility = if (tab == ChildTab.STATS) View.VISIBLE else View.GONE
         llCategoriesTabContent.visibility = if (tab == ChildTab.CATEGORIES) View.VISIBLE else View.GONE
+        llQuestsTabContent.visibility = if (tab == ChildTab.QUESTS) View.VISIBLE else View.GONE
         llHistoryTabContent.visibility = if (tab == ChildTab.HISTORY) View.VISIBLE else View.GONE
 
         styleTabButton(btnTabStats, tab == ChildTab.STATS)
         styleTabButton(btnTabCategories, tab == ChildTab.CATEGORIES)
+        styleTabButton(btnTabQuests, tab == ChildTab.QUESTS)
         styleTabButton(btnTabHistory, tab == ChildTab.HISTORY)
     }
 
     // The selected tab is filled white with purple text (matching every other primary
-    // button on this screen); the other two stay outlined - transparent fill, white text -
-    // so there's always exactly one obviously "on" button in the row.
+    // button on this screen); the other three stay outlined - transparent fill, white
+    // text - so there's always exactly one obviously "on" button in the row.
     private fun styleTabButton(button: MaterialButton, selected: Boolean) {
         if (selected) {
             button.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
@@ -297,6 +335,47 @@ class ChildHomeActivity : AppCompatActivity() {
         } else {
             button.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
             button.setTextColor(ContextCompat.getColor(this, R.color.white))
+        }
+    }
+
+    // A child ticking (or unticking) a quest just flips isChecked - it deliberately never
+    // touches isPaid or the child's balance itself. Only the parent's "Confirm & Pay" on
+    // ChildDetailActivity can actually move money, the same permission boundary every
+    // other money-related action on this screen already respects.
+    private fun onQuestCheckToggled(quest: Quest, isChecked: Boolean) {
+        lifecycleScope.launch {
+            database.questDao().update(quest.copy(isChecked = isChecked))
+            refreshQuests()
+        }
+    }
+
+    // Loads this child's quests, runs every one of them through
+    // QuestScheduler.resetIfNeeded() (writing any reset straight back to the database so
+    // it sticks), then redraws the checklist and the "X of Y done today" progress line -
+    // the same two-step reload-then-redisplay shape refreshCategories() below uses, just
+    // for quests instead of categories.
+    private suspend fun refreshQuests() {
+        val today = Calendar.getInstance()
+        val loaded = database.questDao().getQuestsForChild(childId)
+
+        val resetQuests = loaded.map { quest ->
+            val reset = QuestScheduler.resetIfNeeded(quest, today)
+            if (reset !== quest) {
+                database.questDao().update(reset)
+            }
+            reset
+        }
+
+        quests = resetQuests
+        questAdapter.updateQuests(quests)
+
+        val activeToday = quests.filter { QuestScheduler.isActiveToday(it, today) }
+        val doneToday = activeToday.count { it.isChecked }
+
+        tvQuestProgress.text = if (activeToday.isEmpty()) {
+            "No quests today - check back later!"
+        } else {
+            "$doneToday of ${activeToday.size} done today"
         }
     }
 
@@ -376,3 +455,6 @@ class ChildHomeActivity : AppCompatActivity() {
 // Android Developers, n.d.-b. MarginPageTransformer [Webpage]. Available at:
 //     https://developer.android.com/reference/androidx/viewpager2/widget/MarginPageTransformer
 //     [Accessed 16 September 2026].
+// Android Developers, n.d.-c. RecyclerView.LinearLayoutManager [Webpage]. Available at:
+//     https://developer.android.com/reference/androidx/recyclerview/widget/LinearLayoutManager
+//     [Accessed 18 October 2026].

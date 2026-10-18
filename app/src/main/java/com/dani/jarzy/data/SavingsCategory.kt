@@ -28,7 +28,18 @@ data class SavingsCategory(
     @PrimaryKey(autoGenerate = true) val savingsCategoryId: Long = 0,
     val childId: Long, // which child this savings goal belongs to
     val name: String,
-    val amountSaved: Double = 0.0 // how much of the child's total savings is set aside for this goal
+    val amountSaved: Double = 0.0, // how much of the child's total savings is set aside for this goal
+
+    // Optional monthly spending budget for this category, set by the PARENT only (same
+    // permission split the app already uses for amountSaved - a child can rename a
+    // category but never touch the money side of it). 0.0 means "no budget set" - that
+    // category is just treated as a plain savings pot with no overspending check at all,
+    // which keeps every category created before this field existed working exactly as
+    // they did (Room just fills new columns with their default on the version bump -
+    // Android Developers, n.d.). When it IS set above 0, AddExpenseActivity compares this
+    // child's total spending against it for the current calendar month and warns (but
+    // does not block) once an expense pushes them over it.
+    val budgetSize: Double = 0.0
 )
 
 // References:

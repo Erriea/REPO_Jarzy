@@ -10,9 +10,13 @@ import androidx.room.RoomDatabase
 // Android Developers (n.d.) and Ranju (n.d.) both walk through setting up this same @Database class.
 
 @Database(
-    entities = [ParentAccount::class, ChildAccount::class, Expense::class, SavingsCategory::class],
-    version = 2, // bumped from 1 - ChildAccount's fields changed (monthlyAllowance added,
-                 // minMonthlyGoal/maxMonthlyGoal renamed to minMonthlySpend/maxMonthlySpend)
+    entities = [ParentAccount::class, ChildAccount::class, Expense::class, SavingsCategory::class, Quest::class],
+    version = 3, // bumped from 2 - SavingsCategory gained budgetSize (per-category monthly
+                 // budget, used for the overspending warning) and the new Quest entity/
+                 // table was added for the chore system. fallbackToDestructiveMigration()
+                 // below just wipes and recreates the local database on a version bump
+                 // rather than needing a hand-written Migration object - fine for this
+                 // stage of development where there's no real user data to preserve.
     exportSchema = false
 )
 abstract class JarzyDatabase : RoomDatabase() {
@@ -21,6 +25,7 @@ abstract class JarzyDatabase : RoomDatabase() {
     abstract fun childDao(): ChildDao
     abstract fun expenseDao(): ExpenseDao
     abstract fun savingsCategoryDao(): SavingsCategoryDao
+    abstract fun questDao(): QuestDao
 
     companion object {
         @Volatile
