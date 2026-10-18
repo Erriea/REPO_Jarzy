@@ -4,6 +4,11 @@ plugins {
     alias(libs.plugins.android.application)
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+
+    // Must be applied AFTER the android/kotlin plugins above - it needs the
+    // android {} block already configured so it knows which applicationId
+    // (com.dani.jarzy) to match against app/google-services.json.
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -56,4 +61,15 @@ dependencies {
     // 1.3.2 is still compatible with viewpager2 1.1.0.
     implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+
+    // Firebase: a BoM (Bill of Materials) is a special dependency that doesn't
+    // add any code itself - it just pins a single tested-together version set
+    // for every other "com.google.firebase:..." line below it, so each
+    // individual Firebase artifact doesn't need its own version number.
+    // Firestore is the actual cloud database used to replace/mirror Room.
+    // Recent BoM versions (32+) already fold the old "-ktx" Kotlin extension
+    // artifacts into the main module, so just "firebase-firestore" (no -ktx
+    // suffix) already brings in the Kotlin-friendly API.
+    implementation(platform("com.google.firebase:firebase-bom:35.0.2"))
+    implementation("com.google.firebase:firebase-firestore")
 }
