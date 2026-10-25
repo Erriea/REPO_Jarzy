@@ -9,8 +9,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.dani.jarzy.data.JarzyDatabase
 import com.dani.jarzy.data.SavingsCategory
+import com.dani.jarzy.data.SavingsCategoryRepository
 import kotlinx.coroutines.launch
 
 /**
@@ -22,7 +22,9 @@ import kotlinx.coroutines.launch
  */
 class CreateSavingsCategoryActivity : AppCompatActivity() {
 
-    private lateinit var database: JarzyDatabase
+    // Replaces the old JarzyDatabase (Room) reference - see SavingsCategoryRepository's
+    // class comment for how it mirrors SavingsCategoryDao's methods against Firestore.
+    private val savingsCategoryRepository = SavingsCategoryRepository()
     private var childId: Long = -1L
     private var categories: List<SavingsCategory> = emptyList()
 
@@ -32,7 +34,6 @@ class CreateSavingsCategoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_savings_category)
 
-        database = JarzyDatabase.getDatabase(this)
         childId = intent.getLongExtra("CHILD_ID", -1L)
 
         val btnBack = findViewById<Button>(R.id.btnBack)
@@ -85,7 +86,7 @@ class CreateSavingsCategoryActivity : AppCompatActivity() {
 
             lifecycleScope.launch {
                 // Take the amount out of the source category first.
-                database.savingsCategoryDao().update(
+                savingsCategoryRepository.update(
                     sourceCategory.copy(amountSaved = sourceCategory.amountSaved - amount)
                 )
 
@@ -93,11 +94,11 @@ class CreateSavingsCategoryActivity : AppCompatActivity() {
                 // otherwise create a brand-new one holding just this amount.
                 val existingDestination = categories.firstOrNull { it.name.equals(destinationName, ignoreCase = true) }
                 if (existingDestination != null) {
-                    database.savingsCategoryDao().update(
+                    savingsCategoryRepository.update(
                         existingDestination.copy(amountSaved = existingDestination.amountSaved + amount)
                     )
                 } else {
-                    database.savingsCategoryDao().insert(
+                    savingsCategoryRepository.insert(
                         SavingsCategory(childId = childId, name = destinationName, amountSaved = amount)
                     )
                 }
@@ -113,7 +114,7 @@ class CreateSavingsCategoryActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            categories = database.savingsCategoryDao().getCategoriesForChild(childId)
+            categories = savingsCategoryRepository.getCategoriesForChild(childId)
             val labels = categories.map { "${it.name} (%.2f)".format(it.amountSaved) }
             spinnerFromCategory.adapter = ArrayAdapter(
                 this@CreateSavingsCategoryActivity,

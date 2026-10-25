@@ -17,8 +17,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.dani.jarzy.data.Expense
-import com.dani.jarzy.data.JarzyDatabase
+import com.dani.jarzy.data.ExpenseRepository
 import com.dani.jarzy.data.SavingsCategory
+import com.dani.jarzy.data.SavingsCategoryRepository
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -32,7 +33,11 @@ import java.util.Calendar
  */
 class AddExpenseActivity : AppCompatActivity() {
 
-    private lateinit var database: JarzyDatabase
+    // Replaces the old JarzyDatabase (Room) reference. ExpenseRepository needs a
+    // SavingsCategoryRepository passed into its constructor - see ExpenseRepository's
+    // class comment for why.
+    private val savingsCategoryRepository = SavingsCategoryRepository()
+    private val expenseRepository = ExpenseRepository(savingsCategoryRepository)
 
     private var categories: List<SavingsCategory> = emptyList()
     private var selectedDateMillis: Long? = null
@@ -64,7 +69,6 @@ class AddExpenseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_expense)
 
-        database = JarzyDatabase.getDatabase(this)
         childId = intent.getLongExtra("CHILD_ID", -1L)
 
         val btnBack = findViewById<Button>(R.id.btnBack)
@@ -150,7 +154,7 @@ class AddExpenseActivity : AppCompatActivity() {
             }
 
             lifecycleScope.launch {
-                database.expenseDao().insert(
+                expenseRepository.insert(
                     Expense(
                         childId = childId,
                         savingsCategoryId = selectedCategory.savingsCategoryId,
@@ -163,7 +167,7 @@ class AddExpenseActivity : AppCompatActivity() {
 
                 // Recording the expense deducts it from the category it was spent from
                 // the same pattern CreateSavingsCategoryActivity uses for its source category.
-                database.savingsCategoryDao().update(
+                savingsCategoryRepository.update(
                     selectedCategory.copy(amountSaved = selectedCategory.amountSaved - amount)
                 )
 
@@ -195,9 +199,9 @@ class AddExpenseActivity : AppCompatActivity() {
                     // whichever month the expense falls in (28-31, correctly handling
                     // February) rather than hardcoding 31 (Android Developers, n.d.-b).
                     // getTotalsPerSavingsCategory already includes the expense just
-                    // inserted above, since it re-reads from the database rather than
-                    // using any value cached earlier in this function.
-                    val monthTotals = database.expenseDao()
+                    // inserted above, since it re-reads from Firestore rather than using
+                    // any value cached earlier in this function.
+                    val monthTotals = expenseRepository
                         .getTotalsPerSavingsCategory(childId, monthStart.timeInMillis, monthEnd.timeInMillis)
                     val spentThisMonth = monthTotals
                         .firstOrNull { it.categoryId == selectedCategory.savingsCategoryId }
@@ -224,7 +228,7 @@ class AddExpenseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            categories = database.savingsCategoryDao().getCategoriesForChild(childId)
+            categories = savingsCategoryRepository.getCategoriesForChild(childId)
             val labels = categories.map { "${it.name} (%.2f)".format(it.amountSaved) }
             spinnerCategory.adapter = ArrayAdapter(
                 this@AddExpenseActivity,

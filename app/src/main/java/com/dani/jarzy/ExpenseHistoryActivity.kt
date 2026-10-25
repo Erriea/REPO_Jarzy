@@ -15,7 +15,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import com.dani.jarzy.data.Expense
-import com.dani.jarzy.data.JarzyDatabase
+import com.dani.jarzy.data.ExpenseRepository
+import com.dani.jarzy.data.SavingsCategoryRepository
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -47,7 +48,12 @@ private enum class HistoryViewMode {
  */
 class ExpenseHistoryActivity : AppCompatActivity() {
 
-    private lateinit var database: JarzyDatabase
+    // Replaces the old JarzyDatabase (Room) reference. ExpenseRepository needs a
+    // SavingsCategoryRepository passed into its constructor - see ExpenseRepository's
+    // class comment for why (its getTotalsPerSavingsCategory() has to read both
+    // collections now that Firestore has no JOIN to do that in one query).
+    private val savingsCategoryRepository = SavingsCategoryRepository()
+    private val expenseRepository = ExpenseRepository(savingsCategoryRepository)
     private var childId: Long = -1L
 
     private lateinit var tvExpenseHistoryTotal: TextView
@@ -74,7 +80,6 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense_history)
 
-        database = JarzyDatabase.getDatabase(this)
         childId = intent.getLongExtra("CHILD_ID", -1L)
 
         val btnBack = findViewById<Button>(R.id.btnBack)
@@ -201,7 +206,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
     // refreshing the next time this screen happens to resume.
     private fun loadExpenseHistory() {
         lifecycleScope.launch {
-            val categories = database.savingsCategoryDao().getCategoriesForChild(childId)
+            val categories = savingsCategoryRepository.getCategoriesForChild(childId)
 
             if (categories.isEmpty()) {
                 tvExpenseHistoryTotal.text = "Total Spent: 0.00"
@@ -216,7 +221,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
                     llExpenseEntries.visibility = View.VISIBLE
                     tvExpenseHistoryBreakdown.visibility = View.GONE
 
-                    val expenses = database.expenseDao().getExpensesInRange(childId, startDateMillis, endDateMillis)
+                    val expenses = expenseRepository.getExpensesInRange(childId, startDateMillis, endDateMillis)
 
                     // sumOf() for the running total spent across every category, within
                     // the chosen range (Tutorialspoint, n.d.-a).
@@ -268,10 +273,10 @@ class ExpenseHistoryActivity : AppCompatActivity() {
                     llExpenseEntries.visibility = View.GONE
                     tvExpenseHistoryBreakdown.visibility = View.VISIBLE
 
-                    // getTotalsPerSavingsCategory() does the summing itself in SQL, so
-                    // this view never needs to load the individual expenses at all - just
-                    // one total per category for the chosen range.
-                    val categoryTotals = database.expenseDao().getTotalsPerSavingsCategory(childId, startDateMillis, endDateMillis)
+                    // getTotalsPerSavingsCategory() does the summing itself, so this view
+                    // never needs to load the individual expenses at all - just one total
+                    // per category for the chosen range.
+                    val categoryTotals = expenseRepository.getTotalsPerSavingsCategory(childId, startDateMillis, endDateMillis)
 
                     // associateBy() turns that list into a Map keyed by categoryId, so
                     // each category's total can be looked up directly instead of
