@@ -1,9 +1,9 @@
 package com.dani.jarzy
 
-import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -14,13 +14,28 @@ import com.dani.jarzy.data.SavingsCategory
  * (the parent's per-child view) and ChildHomeActivity (the child's own home screen)
  * this is shown inside a ViewPager2, which uses a RecyclerView.Adapter under the hood like a
  * plain RecyclerView would.
- * One coloured "cube" per savings category, cycling through
- * a small fixed palette from colors.xml so categories are easy to tell apart while swiping
- *
+ * One coloured "jar" graphic per savings category, cycling through a small fixed set of
+ * vector drawables (and a matching text colour from colors.xml) so categories are easy
+ * to tell apart while swiping. Previously this drew a single plain coloured rounded
+ * square ("cube") via GradientDrawable; that has been replaced with a real jar
+ * illustration (ic_jar_green/orange/purple/teal/pink/amber) so the category cards match
+ * the rest of the app's jar-themed visual language, while keeping the exact same
+ * six-colour cycling behaviour the cubes used.
  */
 class CategoryCubeAdapter(
     private var categories: List<SavingsCategory>
 ) : RecyclerView.Adapter<CategoryCubeAdapter.CubeViewHolder>() {
+
+    // Each entry here lines up by index with the matching entry in cubeColorResIds below -
+    // jarDrawableResIds[i] is always the jar drawn in that category's own colour.
+    private val jarDrawableResIds = intArrayOf(
+        R.drawable.ic_jar_green,
+        R.drawable.ic_jar_orange,
+        R.drawable.ic_jar_purple,
+        R.drawable.ic_jar_teal,
+        R.drawable.ic_jar_pink,
+        R.drawable.ic_jar_amber
+    )
 
     private val cubeColorResIds = intArrayOf(
         R.color.cube_green,
@@ -32,7 +47,7 @@ class CategoryCubeAdapter(
     )
 
     class CubeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val cube: View = view.findViewById(R.id.flCube)
+        val jarImage: ImageView = view.findViewById(R.id.ivCubeJar)
         val tvName: TextView = view.findViewById(R.id.tvCubeName)
         val tvAmount: TextView = view.findViewById(R.id.tvCubeAmount)
     }
@@ -59,20 +74,22 @@ class CategoryCubeAdapter(
 
     override fun onBindViewHolder(holder: CubeViewHolder, position: Int) {
         val category = categories[position]
+        val paletteIndex = position % cubeColorResIds.size
 
-        // mutate() first so this cube gets its own copy of the drawable instead of
-        // sharing (and overwriting) the same drawable object every recycled view in the
-        // pager would otherwise point at (Android Developers, n.d.).
-        val background = holder.cube.background.mutate() as GradientDrawable
-        val colorResId = cubeColorResIds[position % cubeColorResIds.size]
-        background.setColor(ContextCompat.getColor(holder.itemView.context, colorResId))
+        // Swap in this category's jar graphic instead of recolouring a shared drawable -
+        // each jar drawable already bakes in its own stroke/lid colour, so there's no
+        // GradientDrawable.mutate()-and-recolour step needed any more.
+        holder.jarImage.setImageResource(jarDrawableResIds[paletteIndex])
+
+        // The jar's body is a light, near-white fill, so the name/amount text is coloured
+        // to match the jar's own colour (instead of the old static white, which was only
+        // readable against a solid-colour cube background) so it stays legible on top of
+        // the jar graphic.
+        val textColor = ContextCompat.getColor(holder.itemView.context, cubeColorResIds[paletteIndex])
+        holder.tvName.setTextColor(textColor)
+        holder.tvAmount.setTextColor(textColor)
 
         holder.tvName.text = category.name
         holder.tvAmount.text = "%.2f".format(category.amountSaved)
     }
 }
-
-// References:
-// Android Developers, n.d. GradientDrawable [Webpage]. Available at:
-//     https://developer.android.com/reference/android/graphics/drawable/GradientDrawable
-//     [Accessed 16 September 2026].

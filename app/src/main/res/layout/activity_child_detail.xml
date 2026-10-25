@@ -36,15 +36,37 @@
                 android:textColor="@color/jarzy_blue"
                 app:backgroundTint="@color/white" />
 
-            <TextView
-                android:id="@+id/tvChildDetailHeading"
-                android:fontFamily="@font/comic_relief_bold"
+            <!-- "Managing: {name}" heading - tvChildDetailHeading's text is set
+                 programmatically in ChildDetailActivity.kt (tvChildDetailHeading.text =
+                 "Managing: $childUsername"), so this is still a plain TextView with no
+                 static android:text here. Now paired with the same round avatar
+                 placeholder (ivChildDetailAvatar) used on the child's own home screen,
+                 wrapped in a horizontal, centred LinearLayout the same way. -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="26sp"
-                android:textColor="@color/white"
+                android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp">
+
+                <ImageView
+                    android:id="@+id/ivChildDetailAvatar"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_avatar_child_placeholder"
+                    android:contentDescription="Child avatar" />
+
+                <TextView
+                    android:id="@+id/tvChildDetailHeading"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="26sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvParentViewLabel"
@@ -408,6 +430,14 @@
                     android:clipToPadding="false"
                     android:clipChildren="false" />
 
+                <!-- app:icon adds the jar-customise glyph (ic_jar_customise) to this
+                     button, tinted jarzy_blue to match the parent's own screens (the
+                     child's equivalent button on activity_child_home.xml tints it
+                     jarzy_purple instead) - safe to use app:icon/app:iconTint/
+                     app:iconGravity/app:iconPadding here because plain <Button> tags
+                     auto-inflate to MaterialButton under this app's Material Components
+                     theme, the same reason app:backgroundTint already worked on this
+                     button. -->
                 <Button
                     android:id="@+id/btnEditCategory"
                     android:fontFamily="@font/comic_relief_bold"
@@ -417,6 +447,10 @@
                     android:textSize="16sp"
                     android:textColor="@color/jarzy_blue"
                     app:backgroundTint="@color/white"
+                    app:icon="@drawable/ic_jar_customise"
+                    app:iconTint="@color/jarzy_blue"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
                     android:layout_marginTop="16dp" />
 
                 <Button

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Amber variant - see ic_jar_green.xml for the full explanation of where this shape
+     came from. Matches the cube_amber colour. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="170dp"
+    android:viewportWidth="120"
+    android:viewportHeight="170">
+
+    <path
+        android:pathData="M34,12 V39.3 A56,64 0 1,0 86,39.3 V12 Z"
+        android:fillColor="#EAF3EE"
+        android:strokeColor="#FFC107"
+        android:strokeWidth="4"
+        android:strokeLineJoin="round" />
+
+    <path
+        android:pathData="M20,104 C19,86 26,72 40,62"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.95" />
+
+    <path
+        android:pathData="M30,0 H90 A4,4 0 0,1 94,4 V10 A4,4 0 0,1 90,14 H30 A4,4 0 0,1 26,10 V4 A4,4 0 0,1 30,0 Z"
+        android:fillColor="#FFC107" />
+
+    <path
+        android:pathData="M46,5 H74 A2,2 0 0,1 76,7 V7 A2,2 0 0,1 74,9 H46 A2,2 0 0,1 44,7 V7 A2,2 0 0,1 46,5 Z"
+        android:fillColor="#EAF3EE" />
+
+</vector>

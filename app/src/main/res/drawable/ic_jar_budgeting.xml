@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Replaces the hand-built placeholder "jar card" (shape_login_card_lid/body/top_band
+     + ic_person_placeholder) on the login screen (activity_main.xml). Converted by hand
+     from a "budgeting jar" SVG the user supplied and generated in an earlier session
+     (identified by its embedded C2PA/Content Credentials metadata) - a coin-slot jar
+     shape rather than the round-shouldered savings jar used for categories, so the two
+     jar graphics read as visually distinct. Blue (#3D6FB4) was already jarzy_blue, used
+     on the placeholder it replaces, so no colour change was needed to fit the app's
+     existing theme. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="170dp"
+    android:viewportWidth="120"
+    android:viewportHeight="170">
+
+    <!-- Jar body outline -->
+    <path
+        android:pathData="M32,12 V34 Q32,40 26,40 H22 Q6,40 6,56 V148 Q6,164 22,164 H98 Q114,164 114,148 V56 Q114,40 98,40 H94 Q88,40 88,34 V12 Z"
+        android:fillColor="#E6EEF8"
+        android:strokeColor="#3D6FB4"
+        android:strokeWidth="4"
+        android:strokeLineJoin="round" />
+
+    <!-- Coin-slot dashes on the left -->
+    <path android:pathData="M16,70 H30" android:strokeColor="#3D6FB4" android:strokeWidth="2.5" android:strokeLineCap="round" android:strokeAlpha="0.55" />
+    <path android:pathData="M16,90 H24" android:strokeColor="#3D6FB4" android:strokeWidth="2.5" android:strokeLineCap="round" android:strokeAlpha="0.55" />
+    <path android:pathData="M16,110 H30" android:strokeColor="#3D6FB4" android:strokeWidth="2.5" android:strokeLineCap="round" android:strokeAlpha="0.55" />
+    <path android:pathData="M16,130 H24" android:strokeColor="#3D6FB4" android:strokeWidth="2.5" android:strokeLineCap="round" android:strokeAlpha="0.55" />
+    <path android:pathData="M16,150 H30" android:strokeColor="#3D6FB4" android:strokeWidth="2.5" android:strokeLineCap="round" android:strokeAlpha="0.55" />
+
+    <!-- Glass highlight -->
+    <path
+        android:pathData="M100,62 V118"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.95" />
+
+    <!-- Lid -->
+    <path
+        android:pathData="M28,0 H92 A4,4 0 0,1 96,4 V10 A4,4 0 0,1 92,14 H28 A4,4 0 0,1 24,10 V4 A4,4 0 0,1 28,0 Z"
+        android:fillColor="#3D6FB4" />
+
+</vector>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One of six colour variants of the savings-category "jar" graphic, swapped in by
+     CategoryCubeAdapter in place of the old plain coloured square cube. Converted by
+     hand from a jar-shaped SVG the user supplied and generated in an earlier session
+     (identified by its embedded C2PA/Content Credentials metadata) - the SVG path
+     syntax (M/L/H/V/C/S/Q/T/A/Z commands) is directly compatible with Android's
+     android:pathData, so the body/handle/lid shapes carried over unchanged; only the
+     stroke colour below is swapped per category (green here, matching cube_green). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="170dp"
+    android:viewportWidth="120"
+    android:viewportHeight="170">
+
+    <!-- Jar body outline -->
+    <path
+        android:pathData="M34,12 V39.3 A56,64 0 1,0 86,39.3 V12 Z"
+        android:fillColor="#EAF3EE"
+        android:strokeColor="#4CAF50"
+        android:strokeWidth="4"
+        android:strokeLineJoin="round" />
+
+    <!-- Glass highlight -->
+    <path
+        android:pathData="M20,104 C19,86 26,72 40,62"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.95" />
+
+    <!-- Lid -->
+    <path
+        android:pathData="M30,0 H90 A4,4 0 0,1 94,4 V10 A4,4 0 0,1 90,14 H30 A4,4 0 0,1 26,10 V4 A4,4 0 0,1 30,0 Z"
+        android:fillColor="#4CAF50" />
+
+    <!-- Lid knob -->
+    <path
+        android:pathData="M46,5 H74 A2,2 0 0,1 76,7 V7 A2,2 0 0,1 74,9 H46 A2,2 0 0,1 44,7 V7 A2,2 0 0,1 46,5 Z"
+        android:fillColor="#EAF3EE" />
+
+</vector>

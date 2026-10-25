@@ -1,47 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One page in the Categories tab's swipeable card carousel - a coloured rounded
-     square ("cube") naming the category and showing its current amount. The outer
-     FrameLayout carries a small amount of side padding so cards don't touch each other
-     edge-to-edge; most of the peek effect itself comes from vpCategories' own padding
-     plus clipToPadding=false, set on the ViewPager2 in ChildDetailActivity. -->
+<!-- One page in the Categories tab's swipeable card carousel - now a coloured "jar"
+     graphic (one of the six ic_jar_* vector drawables, cycled through by
+     CategoryCubeAdapter) naming the category and showing its current amount, in place
+     of the original plain coloured rounded-square "cube". The outer FrameLayout still
+     carries a small amount of side padding so cards don't touch each other edge-to-edge;
+     most of the peek effect itself comes from vpCategories' own padding plus
+     clipToPadding=false, set on the ViewPager2 in ChildDetailActivity. ivCubeJar uses
+     fitCenter (not a stretched background) so the jar's proportions stay correct no
+     matter the card's size. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp">
 
-    <FrameLayout
-        android:id="@+id/flCube"
+    <ImageView
+        android:id="@+id/ivCubeJar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/shape_cube">
+        android:scaleType="fitCenter"
+        android:contentDescription="Category jar" />
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/tvCubeName"
+            android:fontFamily="@font/comic_relief_bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:textSize="20sp"
+            android:gravity="center" />
 
-            <TextView
-                android:id="@+id/tvCubeName"
-                android:fontFamily="@font/comic_relief_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@color/white"
-                android:gravity="center" />
+        <TextView
+            android:id="@+id/tvCubeAmount"
+            android:fontFamily="@font/comic_relief_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:layout_marginTop="8dp" />
 
-            <TextView
-                android:id="@+id/tvCubeAmount"
-                android:fontFamily="@font/comic_relief_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="28sp"
-                android:textColor="@color/white"
-                android:layout_marginTop="8dp" />
-
-        </LinearLayout>
-
-    </FrameLayout>
+    </LinearLayout>
 
 </FrameLayout>

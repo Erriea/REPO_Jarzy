@@ -30,15 +30,35 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <TextView
-                android:id="@+id/tvChildWelcome"
-                android:fontFamily="@font/comic_relief_bold"
+            <!-- Welcome heading, now with a small round avatar placeholder beside it
+                 (ivChildAvatar) - wrapped in its own horizontal, centred LinearLayout
+                 since tvChildWelcome used to be the sole match_parent-width view here;
+                 it's switched to wrap_content so the pair sits centred as a unit. -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Welcome"
-                android:textSize="28sp"
-                android:textColor="@color/white"
-                android:gravity="center" />
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/ivChildAvatar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_avatar_child_placeholder"
+                    android:contentDescription="Child avatar" />
+
+                <TextView
+                    android:id="@+id/tvChildWelcome"
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome"
+                    android:textSize="28sp"
+                    android:textColor="@color/white"
+                    android:gravity="center" />
+
+            </LinearLayout>
 
             <!-- The four-way toggle - selectTab() in ChildHomeActivity.kt shows and hides
                  the matching content block below and restyles these four buttons (filled
@@ -247,6 +267,11 @@
                     android:clipToPadding="false"
                     android:clipChildren="false" />
 
+                <!-- app:icon adds the jar-customise glyph (ic_jar_customise) to this
+                     button - safe to use app:icon/app:iconTint/app:iconGravity/
+                     app:iconPadding here because plain <Button> tags auto-inflate to
+                     MaterialButton under this app's Material Components theme, the same
+                     reason app:backgroundTint already worked on this button. -->
                 <Button
                     android:id="@+id/btnEditCategory"
                     android:fontFamily="@font/comic_relief_bold"
@@ -256,6 +281,10 @@
                     android:textSize="16sp"
                     android:textColor="@color/jarzy_purple"
                     app:backgroundTint="@color/white"
+                    app:icon="@drawable/ic_jar_customise"
+                    app:iconTint="@color/jarzy_purple"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
                     android:layout_marginTop="16dp" />
 
                 <Button

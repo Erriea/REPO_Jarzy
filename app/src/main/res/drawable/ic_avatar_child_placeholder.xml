@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generic round "child avatar" placeholder shown next to the welcome heading on
+     ChildHomeActivity and the "Managing: {name}" heading on ChildDetailActivity, until
+     real per-child profile pictures are supported. Converted by hand from an
+     "avatar child placeholder" SVG the user supplied and generated in an earlier
+     session (identified by its embedded C2PA/Content Credentials metadata). The SVG's
+     circular clip-path became Android's <clip-path> element (API 24+, safe here since
+     this app's minSdk is 26) - unlike SVG, where a clipPath is defined once in <defs>
+     and referenced by id, Android's <clip-path> is a sibling element that clips every
+     subsequent sibling drawn after it in the same parent, so it's placed first, before
+     the background/body/head/hair paths it needs to clip. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <clip-path android:pathData="M0,60 A60,60 0 1,0 120,60 A60,60 0 1,0 0,60 Z" />
+
+    <!-- Background circle -->
+    <path
+        android:pathData="M0,0 H120 V120 H0 Z"
+        android:fillColor="#DCEBE2" />
+
+    <!-- Shoulders/body -->
+    <path
+        android:pathData="M10,120 C10,95 30,82 60,82 C90,82 110,95 110,120 Z"
+        android:fillColor="#2F8F6C" />
+
+    <!-- Hair -->
+    <path
+        android:pathData="M30,42 C30,20 48,8 60,8 C72,8 90,20 90,42 C90,46 88,50 88,50 C84,38 74,30 60,30 C46,30 36,38 32,50 C32,50 30,46 30,42 Z"
+        android:fillColor="#1F6B50" />
+
+    <!-- Head -->
+    <path
+        android:pathData="M60,28 A26,26 0 1,0 60.01,28 Z"
+        android:fillColor="#2F8F6C"
+        android:strokeColor="#DCEBE2"
+        android:strokeWidth="2" />
+
+    <!-- Ears -->
+    <path android:pathData="M34,50 A6,6 0 1,0 34.01,50 Z" android:fillColor="#2F8F6C" />
+    <path android:pathData="M86,50 A6,6 0 1,0 86.01,50 Z" android:fillColor="#2F8F6C" />
+
+</vector>

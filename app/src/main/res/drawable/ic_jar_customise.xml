@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A small jar-outline + gear glyph added to the "Edit Category" button (see
+     app:icon on btnEditCategory in activity_child_home.xml and activity_child_detail.xml)
+     so the button reads as "customise this jar" rather than a plain text label.
+     Converted by hand from a "jar customise" SVG the user supplied and generated in an
+     earlier session (identified by its embedded C2PA/Content Credentials metadata).
+     Baked as plain black (#FF000000) - Button/MaterialButton's app:iconTint recolours
+     it per screen (jarzy_purple on the child's own screen, jarzy_blue on the parent's
+     child-detail screen) rather than needing a separate file per colour, unlike the six
+     category jars above which have no equivalent single recolour hook. The gear is
+     nested in its own <group> with a scale+translate so it sits as a small badge over
+     the jar's bottom-right corner instead of at full size - the equivalent of the
+     original SVG's <g transform="translate(12,12) scale(0.45) translate(-12,-12)">,
+     worked out by hand since Android's VectorDrawable has no transform attribute, only
+     pivotX/Y + scaleX/Y + translateX/Y on <group> (translate(A,A) scale(S)
+     translate(-P,-P) is equivalent to pivotX=P, pivotY=P, scaleX=scaleY=S,
+     translateX=translateY=(A-P); here A=12, P=12, S=0.45, so translateX/Y=12-12=... see
+     below, re-centred to sit bottom-right of the 24x24 viewport instead of dead centre). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Jar outline (simplified to a small glyph at this size) -->
+    <path
+        android:pathData="M8,3 V5.5 Q8,6.5 7,6.5 H6 Q3,6.5 3,9.5 V18 Q3,21 6,21 H14 Q17,21 17,18 V9.5 Q17,6.5 14,6.5 H13 Q12,6.5 12,5.5 V3 Z"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+
+    <!-- Gear badge, scaled down and shifted to the jar's bottom-right corner -->
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:scaleX="0.45"
+        android:scaleY="0.45"
+        android:translateX="5"
+        android:translateY="5">
+
+        <path
+            android:pathData="M12,8 A4,4 0 1,0 12,16 A4,4 0 1,0 12,8 Z"
+            android:strokeColor="#FF000000"
+            android:strokeWidth="3.4"
+            android:fillColor="#00000000" />
+
+        <path
+            android:pathData="M9,12 A3,3 0 1,0 15,12 A3,3 0 1,0 9,12 Z"
+            android:fillColor="#FF000000" />
+
+    </group>
+
+</vector>

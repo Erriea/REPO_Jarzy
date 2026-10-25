@@ -31,45 +31,18 @@
             android:gravity="center_horizontal"
             android:padding="24dp">
 
-            <!-- Placeholder "jar" graphic - a white rounded card with a blue top band and
-                 a generic person glyph, standing in for the real jar photo. Once that
-                 photo is provided, this whole block can be swapped for a single
-                 ImageView. -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:layout_marginTop="8dp">
-
-                <View
-                    android:layout_width="56dp"
-                    android:layout_height="18dp"
-                    android:background="@drawable/shape_login_card_lid" />
-
-                <FrameLayout
-                    android:layout_width="180dp"
-                    android:layout_height="200dp"
-                    android:background="@drawable/shape_login_card_body"
-                    android:layout_marginTop="-6dp">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="90dp"
-                        android:layout_gravity="top"
-                        android:background="@drawable/shape_login_card_top_band" />
-
-                    <ImageView
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="36dp"
-                        android:src="@drawable/ic_person_placeholder"
-                        android:contentDescription="Placeholder graphic - a jar photo will replace this" />
-
-                </FrameLayout>
-
-            </LinearLayout>
+            <!-- Real jar graphic - replaces the old hand-built placeholder card (a white
+                 rounded shape, a blue top band, and a generic person glyph standing in for
+                 a photo). ic_jar_budgeting is a vector drawable converted from a
+                 "budgeting jar" SVG the user supplied in a later session; it was already
+                 drawn in jarzy_blue, so it slots in without any colour change. Sized to
+                 preserve the drawable's own 120:170 aspect ratio. -->
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="212dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_jar_budgeting"
+                android:contentDescription="Jarzy savings jar" />
 
             <TextView
                 android:fontFamily="@font/comic_relief_bold"
