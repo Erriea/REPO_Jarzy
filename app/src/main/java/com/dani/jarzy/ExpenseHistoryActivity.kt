@@ -337,14 +337,18 @@ class ExpenseHistoryActivity : AppCompatActivity() {
     private fun setUpChart() {
         chartCategoryTotals.description.isEnabled = false // no small caption under the chart
         chartCategoryTotals.setFitBars(true)
-        chartCategoryTotals.legend.textColor = ContextCompat.getColor(this, R.color.white)
+
+        // jarzy_blue everywhere below - the chart has a white background (set in
+        // activity_expense_history.xml) so it needs dark text, not the white text the
+        // rest of this screen uses on its own blue background.
+        chartCategoryTotals.legend.textColor = ContextCompat.getColor(this, R.color.jarzy_blue)
         chartCategoryTotals.axisRight.isEnabled = false // only the left axis is needed
 
-        chartCategoryTotals.axisLeft.textColor = ContextCompat.getColor(this, R.color.white)
+        chartCategoryTotals.axisLeft.textColor = ContextCompat.getColor(this, R.color.jarzy_blue)
         chartCategoryTotals.axisLeft.axisMinimum = 0f // spending can never be negative
 
         chartCategoryTotals.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        chartCategoryTotals.xAxis.textColor = ContextCompat.getColor(this, R.color.white)
+        chartCategoryTotals.xAxis.textColor = ContextCompat.getColor(this, R.color.jarzy_blue)
         chartCategoryTotals.xAxis.granularity = 1f // one label per bar, never a fraction
         chartCategoryTotals.xAxis.setDrawGridLines(false)
     }
@@ -369,7 +373,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
 
         val dataSet = BarDataSet(entries, "Spent per category")
         dataSet.color = ContextCompat.getColor(this, R.color.jarzy_blue)
-        dataSet.valueTextColor = ContextCompat.getColor(this, R.color.white)
+        dataSet.valueTextColor = ContextCompat.getColor(this, R.color.jarzy_blue)
 
         chartCategoryTotals.data = BarData(dataSet)
 
@@ -386,8 +390,8 @@ class ExpenseHistoryActivity : AppCompatActivity() {
 
         if (minMonthlySpend > 0.0) {
             val minLine = LimitLine(minMonthlySpend.toFloat(), "Min: %.2f".format(minMonthlySpend))
-            minLine.lineColor = ContextCompat.getColor(this, R.color.white)
-            minLine.textColor = ContextCompat.getColor(this, R.color.white)
+            minLine.lineColor = ContextCompat.getColor(this, R.color.cube_green)
+            minLine.textColor = ContextCompat.getColor(this, R.color.cube_green)
             minLine.lineWidth = 1.5f
             chartCategoryTotals.axisLeft.addLimitLine(minLine)
         }
@@ -395,7 +399,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         if (maxMonthlySpend > 0.0) {
             val maxLine = LimitLine(maxMonthlySpend.toFloat(), "Max: %.2f".format(maxMonthlySpend))
             maxLine.lineColor = ContextCompat.getColor(this, R.color.cube_orange)
-            maxLine.textColor = ContextCompat.getColor(this, R.color.white)
+            maxLine.textColor = ContextCompat.getColor(this, R.color.cube_orange)
             maxLine.lineWidth = 1.5f
             chartCategoryTotals.axisLeft.addLimitLine(maxLine)
         }

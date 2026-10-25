@@ -140,12 +140,19 @@
                      visibility toggle as llExpenseEntries/tvExpenseHistoryBreakdown above.
                      Fixed height (rather than wrap_content) because BarChart needs a real
                      pixel size to lay out its bars and axes in - it can't size itself to
-                     its content the way a TextView can (MPAndroidChart, n.d.). -->
+                     its content the way a TextView can (MPAndroidChart, n.d.). Given an
+                     explicit white background here (the chart is otherwise transparent,
+                     which let the blue bars drawn in loadExpenseHistory() disappear
+                     completely against this screen's own blue background) - matches the
+                     same white-card-on-blue look already used for the pill buttons
+                     elsewhere in this app. -->
                 <com.github.mikephil.charting.charts.BarChart
                     android:id="@+id/chartCategoryTotals"
                     android:layout_width="match_parent"
                     android:layout_height="260dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/white"
+                    android:padding="8dp" />
 
                 <TextView
                     android:id="@+id/tvExpenseHistoryBreakdown"
