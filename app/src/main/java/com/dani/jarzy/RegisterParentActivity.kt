@@ -7,8 +7,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.dani.jarzy.data.JarzyDatabase
 import com.dani.jarzy.data.ParentAccount
+import com.dani.jarzy.data.ParentRepository
 import kotlinx.coroutines.launch
 
 /**
@@ -18,13 +18,13 @@ import kotlinx.coroutines.launch
  */
 class RegisterParentActivity : AppCompatActivity() {
 
-    private lateinit var database: JarzyDatabase
+    // Replaces the old JarzyDatabase (Room) reference - see ParentRepository's class
+    // comment for how it mirrors ParentDao's methods against Firestore instead.
+    private val parentRepository = ParentRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_parent)
-
-        database = JarzyDatabase.getDatabase(this)
 
         val btnBack = findViewById<Button>(R.id.btnBack)
         val etUsername = findViewById<EditText>(R.id.etRegUsername)
@@ -62,7 +62,7 @@ class RegisterParentActivity : AppCompatActivity() {
             }
 
             lifecycleScope.launch {
-                val existing = database.parentDao().getByUsername(username)
+                val existing = parentRepository.getByUsername(username)
                 if (existing != null) {
                     tvError.text = "That username is already taken."
                     return@launch
@@ -71,7 +71,7 @@ class RegisterParentActivity : AppCompatActivity() {
                 // Categories no longer need seeding here - they now belong to each CHILD
                 // (as savings categories), so a "General" one is created when a child
                 // registers instead of here when the parent does.
-                database.parentDao().insert(ParentAccount(username = username, password = password))
+                parentRepository.insert(ParentAccount(username = username, password = password))
 
                 Toast.makeText(this@RegisterParentActivity, "Account created! You can now log in.", Toast.LENGTH_LONG).show()
                 finish()

@@ -8,8 +8,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.dani.jarzy.data.ChildAccount
-import com.dani.jarzy.data.JarzyDatabase
+import com.dani.jarzy.data.ChildRepository
 import com.dani.jarzy.data.SavingsCategory
+import com.dani.jarzy.data.SavingsCategoryRepository
 import kotlinx.coroutines.launch
 
 /**
@@ -22,7 +23,11 @@ import kotlinx.coroutines.launch
  */
 class RegisterChildActivity : AppCompatActivity() {
 
-    private lateinit var database: JarzyDatabase
+    // Replace the old JarzyDatabase (Room) reference - see ChildRepository/
+    // SavingsCategoryRepository's own class comments for how they mirror the old DAOs'
+    // methods against Firestore instead.
+    private val childRepository = ChildRepository()
+    private val savingsCategoryRepository = SavingsCategoryRepository()
 
     // Category names the parent has added so far on this screen, in the order they were
     // added - held in memory only until "Register Child" is tapped and they're all saved
@@ -32,8 +37,6 @@ class RegisterChildActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_child)
-
-        database = JarzyDatabase.getDatabase(this)
 
         val parentId = intent.getLongExtra("PARENT_ID", -1L)
 
@@ -127,7 +130,7 @@ class RegisterChildActivity : AppCompatActivity() {
             }
 
             lifecycleScope.launch {
-                val existing = database.childDao().getByUsername(username)
+                val existing = childRepository.getByUsername(username)
                 if (existing != null) {
                     tvError.text = "That username is already taken."
                     return@launch
@@ -135,7 +138,7 @@ class RegisterChildActivity : AppCompatActivity() {
 
                 // insert() returns the new childId, which we need immediately below to
                 // create that child's savings categories.
-                val newChildId = database.childDao().insert(
+                val newChildId = childRepository.insert(
                     ChildAccount(
                         parentId = parentId,
                         username = username,
@@ -156,7 +159,7 @@ class RegisterChildActivity : AppCompatActivity() {
                 // get added again automatically, that's the only thing this does for now.
                 for ((index, name) in categoriesToCreate.withIndex()) {
                     val startingAmount = if (index == 0) allowance else 0.0
-                    database.savingsCategoryDao().insert(
+                    savingsCategoryRepository.insert(
                         SavingsCategory(childId = newChildId, name = name, amountSaved = startingAmount)
                     )
                 }

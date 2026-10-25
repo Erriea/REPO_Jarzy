@@ -9,10 +9,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.dani.jarzy.data.JarzyDatabase
-import com.google.firebase.firestore.FirebaseFirestore
+import com.dani.jarzy.data.ChildRepository
+import com.dani.jarzy.data.ParentRepository
 import kotlinx.coroutines.launch
-import android.util.Log
 /**
  * MainActivity is the app's entry point / login screen.
  * The user must explicitly choose "Parent" or "Child" via a RadioGroup before logging in.
@@ -20,55 +19,16 @@ import android.util.Log
 
 class MainActivity : AppCompatActivity() {
 
-    // Reference to the Room database singleton so this Activity can run login queries.
-    // Declared here with lateinit because it depends on "this" context,
-    // which is only safely available once onCreate() runs.
-    private lateinit var database: JarzyDatabase
+    // Firestore-backed repositories this screen needs to check login details - see
+    // ParentRepository/ChildRepository's own comments for how they replace the old
+    // Room DAOs field-for-field. A plain property (not lateinit) works fine here since
+    // neither repository needs "this" Activity context to be constructed.
+    private val parentRepository = ParentRepository()
+    private val childRepository = ChildRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // Get / create on first-ever call the single shared database instance for the whole app
-        // doesnt just open a new connection every time this screen loads.
-        database = JarzyDatabase.getDatabase(this)
-
-        // ===== TEMPORARY FIREBASE CONNECTION TEST - remove once confirmed working =====
-        // This block exists purely to prove Firestore is wired up correctly after
-        // adding the Google Services plugin and google-services.json - it has nothing
-        // to do with the login flow below. It writes one small test document, then
-        // immediately reads it straight back, so a round trip to the real cloud
-        // database is confirmed, not just that the write call didn't crash. It's
-        // safe to run every time this screen loads: it always overwrites the same
-        // single "test_doc" document rather than piling up new ones, and it never
-        // touches any of the app's real collections. The set()/get() pattern used
-        // here is Firestore's standard way to write and read a single document
-        // (Google, n.d.).
-        val firestore = FirebaseFirestore.getInstance()
-        val testData = hashMapOf(
-            "message" to "Hello from Jarzy!",
-            "timestamp" to System.currentTimeMillis()
-        )
-        firestore.collection("connection_test").document("test_doc")
-            .set(testData)
-            .addOnSuccessListener {
-                Log.d("FirestoreTest", "Write succeeded")
-                firestore.collection("connection_test").document("test_doc")
-                    .get()
-                    .addOnSuccessListener { doc ->
-                        Log.d("FirestoreTest", "Read back: ${doc.data}")
-                        Toast.makeText(this, "Firebase connected!", Toast.LENGTH_LONG).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("FirestoreTest", "Read failed", e)
-                        Toast.makeText(this, "Firebase write OK but read failed: ${e.message}", Toast.LENGTH_LONG).show()
-                    }
-            }
-            .addOnFailureListener { e ->
-                Log.e("FirestoreTest", "Write failed", e)
-                Toast.makeText(this, "Firebase connection failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        // ===== END TEMPORARY TEST =====
 
         // Grab references to every view on the login screen by their XML IDs so we
         // can read from the text fields and attach click the buttons.
@@ -98,14 +58,15 @@ class MainActivity : AppCompatActivity() {
             val loggingInAsParent = rgLoginType.checkedRadioButtonId == R.id.rbParent
 
 
-            // Room database calls must be "suspend" functions and cannot run on the main (UI) thread.
+            // Repository calls are "suspend" functions (same as the Room DAO calls they
+            // replaced) and cannot run on the main (UI) thread.
             // lifecycleScope.launch starts a coroutine that is automatically tied to this Activity's lifecycle
             // if the Activity is destroyed while the login check is still running:
             // the coroutine cancelled automatically instead of trying to update views that no longer exist (Zoha, 2019).
             lifecycleScope.launch {
                 if (loggingInAsParent) {
-                    // Only the parent table is checked
-                    val parent = database.parentDao().login(username, password)
+                    // Only the parents collection is checked
+                    val parent = parentRepository.login(username, password)
                     //parents first
                     if (parent != null) {
                         tvError.text = ""
@@ -118,8 +79,8 @@ class MainActivity : AppCompatActivity() {
                         tvError.text = "Incorrect parent username or password."
                     }
                 } else {
-                    // "Child" was selected - only the child table is checked.
-                    val child = database.childDao().login(username, password)
+                    // "Child" was selected - only the children collection is checked.
+                    val child = childRepository.login(username, password)
                     if (child != null) {
                         tvError.text = ""
                         // An explicit Intent names the exact Activity to open next. putExtra()
@@ -170,7 +131,3 @@ class MainActivity : AppCompatActivity() {
 // GeeksforGeeks, 2025. What is Toast and How to Use it in Android with Examples? [Webpage].
 //     Available at: https://www.geeksforgeeks.org/android/what-is-toast-and-how-to-use-it-in-android-with-examples/
 //     [Accessed 12 September 2026].
-
-// Google, n.d. Add data to Cloud Firestore [Webpage]. Available at:
-//     https://firebase.google.com/docs/firestore/manage-data/add-data
-//     [Accessed 25 October 2026].

@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.dani.jarzy.data.ChildAccount
-import com.dani.jarzy.data.JarzyDatabase
+import com.dani.jarzy.data.ChildRepository
 import kotlinx.coroutines.launch
 
 /**
@@ -20,7 +20,9 @@ import kotlinx.coroutines.launch
  */
 class ParentHomeActivity : AppCompatActivity() {
 
-    private lateinit var database: JarzyDatabase
+    // Replaces the old JarzyDatabase (Room) reference - see ChildRepository's class
+    // comment for how it mirrors ChildDao's methods against Firestore instead.
+    private val childRepository = ChildRepository()
 
     private var children: List<ChildAccount> = emptyList()
     private var parentId: Long = -1L
@@ -31,7 +33,6 @@ class ParentHomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_parent_home)
 
-        database = JarzyDatabase.getDatabase(this)
         parentId = intent.getLongExtra("PARENT_ID", -1L)
         val parentUsername = intent.getStringExtra("PARENT_USERNAME") ?: ""
 
@@ -75,7 +76,7 @@ class ParentHomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            children = database.childDao().getChildrenForParent(parentId)
+            children = childRepository.getChildrenForParent(parentId)
             val usernames = children.map { it.username }
 
             // item_spinner_text is a custom row layout (just a bigger TextView) used for
