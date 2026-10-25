@@ -24,10 +24,12 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.dani.jarzy.data.ChildAccount
-import com.dani.jarzy.data.JarzyDatabase
+import com.dani.jarzy.data.ChildRepository
 import com.dani.jarzy.data.Quest
+import com.dani.jarzy.data.QuestRepository
 import com.dani.jarzy.data.QuestType
 import com.dani.jarzy.data.SavingsCategory
+import com.dani.jarzy.data.SavingsCategoryRepository
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -64,7 +66,12 @@ private enum class DetailTab {
  */
 class ChildDetailActivity : AppCompatActivity() {
 
-    private lateinit var database: JarzyDatabase
+    // Replaces the old JarzyDatabase (Room) reference - see ChildRepository/
+    // SavingsCategoryRepository/QuestRepository's own class comments for how they
+    // mirror the old DAOs' methods against Firestore instead.
+    private val childRepository = ChildRepository()
+    private val savingsCategoryRepository = SavingsCategoryRepository()
+    private val questRepository = QuestRepository()
     private var childId: Long = -1L
 
     // The full, freshly-loaded row for this child - kept around so the "Save Changes"
@@ -117,8 +124,6 @@ class ChildDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_child_detail)
-
-        database = JarzyDatabase.getDatabase(this)
 
         // Both extras are read once here
         // the id for every database call on this
@@ -280,13 +285,13 @@ class ChildDetailActivity : AppCompatActivity() {
                 // Username has to stay unique across every child
                 // but this child is allowed to keep its own existing username
                 // only blocks the save if a different child already has it.
-                val existing = database.childDao().getByUsername(username)
+                val existing = childRepository.getByUsername(username)
                 if (existing != null && existing.childId != child.childId) {
                     tvAccountEditError.text = "That username is already taken by another account."
                     return@launch
                 }
 
-                database.childDao().update(
+                childRepository.update(
                     child.copy(
                         username = username,
                         password = password,
@@ -334,7 +339,7 @@ class ChildDetailActivity : AppCompatActivity() {
                 }
 
                 lifecycleScope.launch {
-                    database.savingsCategoryDao().insert(
+                    savingsCategoryRepository.insert(
                         SavingsCategory(childId = childId, name = name, amountSaved = amount, budgetSize = budget)
                     )
                     Toast.makeText(this@ChildDetailActivity, "Category added!", Toast.LENGTH_SHORT).show()
@@ -359,7 +364,7 @@ class ChildDetailActivity : AppCompatActivity() {
                 existingBudget = if (selected.budgetSize > 0) selected.budgetSize.toString() else ""
             ) { name, amount, budget ->
                 lifecycleScope.launch {
-                    database.savingsCategoryDao().update(selected.copy(name = name, amountSaved = amount, budgetSize = budget))
+                    savingsCategoryRepository.update(selected.copy(name = name, amountSaved = amount, budgetSize = budget))
                     Toast.makeText(this@ChildDetailActivity, "Category updated!", Toast.LENGTH_SHORT).show()
                     refreshAll()
                 }
@@ -411,20 +416,20 @@ class ChildDetailActivity : AppCompatActivity() {
                         if (selected.amountSaved > 0) {
                             val generalCategory = categories.firstOrNull { it.name.equals("General", ignoreCase = true) }
                             if (generalCategory != null) {
-                                database.savingsCategoryDao().update(
+                                savingsCategoryRepository.update(
                                     generalCategory.copy(amountSaved = generalCategory.amountSaved + selected.amountSaved)
                                 )
                             } else {
                                 // Defensive fallback
                                 // every child should already have a General category
                                 //  create one if it's somehow missing
-                                database.savingsCategoryDao().insert(
+                                savingsCategoryRepository.insert(
                                     SavingsCategory(childId = childId, name = "General", amountSaved = selected.amountSaved)
                                 )
                             }
                         }
 
-                        database.savingsCategoryDao().delete(selected)
+                        savingsCategoryRepository.delete(selected)
                         Toast.makeText(this@ChildDetailActivity, "Category deleted.", Toast.LENGTH_SHORT).show()
                         refreshAll()
                     }
@@ -532,15 +537,15 @@ class ChildDetailActivity : AppCompatActivity() {
     // both put money in exactly the same place: any money not tied to a specific
     // budgeting category the child set up themselves lands in General by default.
     private suspend fun addToGeneralCategory(amount: Double) {
-        val existingCategories = database.savingsCategoryDao().getCategoriesForChild(childId)
+        val existingCategories = savingsCategoryRepository.getCategoriesForChild(childId)
         val generalCategory = existingCategories.firstOrNull { it.name.equals("General", ignoreCase = true) }
 
         if (generalCategory != null) {
-            database.savingsCategoryDao().update(
+            savingsCategoryRepository.update(
                 generalCategory.copy(amountSaved = generalCategory.amountSaved + amount)
             )
         } else {
-            database.savingsCategoryDao().insert(
+            savingsCategoryRepository.insert(
                 SavingsCategory(childId = childId, name = "General", amountSaved = amount)
             )
         }
@@ -678,7 +683,7 @@ class ChildDetailActivity : AppCompatActivity() {
                             return@launch
                         }
 
-                        database.questDao().insert(proposedQuest)
+                        questRepository.insert(proposedQuest)
                         Toast.makeText(this@ChildDetailActivity, "Quest added!", Toast.LENGTH_SHORT).show()
                     } else {
                         // Changing a quest's schedule mid-period could leave isChecked/
@@ -686,7 +691,7 @@ class ChildDetailActivity : AppCompatActivity() {
                         // switching Daily to Weekly), so editing always resets them -
                         // simpler and safer than trying to carry old progress across a
                         // schedule change.
-                        database.questDao().update(
+                        questRepository.update(
                             existingQuest.copy(
                                 name = name, reward = reward, type = type.name, weeklyDayOfWeek = weeklyDay,
                                 startDate = startDateMillis, endDate = endDateMillis,
@@ -710,7 +715,7 @@ class ChildDetailActivity : AppCompatActivity() {
             .setMessage("Delete \"${quest.name}\"?")
             .setPositiveButton("Delete") { _, _ ->
                 lifecycleScope.launch {
-                    database.questDao().delete(quest)
+                    questRepository.delete(quest)
                     Toast.makeText(this@ChildDetailActivity, "Quest deleted.", Toast.LENGTH_SHORT).show()
                     refreshQuests()
                 }
@@ -735,7 +740,7 @@ class ChildDetailActivity : AppCompatActivity() {
             val totalReward = toPay.sumOf { it.reward }
 
             toPay.forEach { quest ->
-                database.questDao().update(quest.copy(isPaid = true))
+                questRepository.update(quest.copy(isPaid = true))
             }
 
             addToGeneralCategory(totalReward)
@@ -764,12 +769,12 @@ class ChildDetailActivity : AppCompatActivity() {
     // every other query on this screen.
     private suspend fun refreshQuests() {
         val today = Calendar.getInstance()
-        val loaded = database.questDao().getQuestsForChild(childId)
+        val loaded = questRepository.getQuestsForChild(childId)
 
         val resetQuests = loaded.map { quest ->
             val reset = QuestScheduler.resetIfNeeded(quest, today)
             if (reset !== quest) {
-                database.questDao().update(reset)
+                questRepository.update(reset)
             }
             reset
         }
@@ -794,7 +799,7 @@ class ChildDetailActivity : AppCompatActivity() {
     // button above all need to reload and redisplay the same child + category data.
     private fun refreshAll() {
         lifecycleScope.launch {
-            val child = database.childDao().getById(childId)
+            val child = childRepository.getById(childId)
             currentChild = child
 
             if (child != null) {
@@ -807,7 +812,7 @@ class ChildDetailActivity : AppCompatActivity() {
                 tvSpendRange.text = "Min Spend: %.2f   Max Spend: %.2f".format(child.minMonthlySpend, child.maxMonthlySpend)
             }
 
-            categories = database.savingsCategoryDao().getCategoriesForChild(childId)
+            categories = savingsCategoryRepository.getCategoriesForChild(childId)
 
             // Balance is the sum of this child's categories, not a stored field - the
             // same one-source-of-truth approach as ChildHomeActivity (Tutorialspoint, n.d.-b).

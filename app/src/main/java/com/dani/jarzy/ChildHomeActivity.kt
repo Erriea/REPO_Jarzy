@@ -18,9 +18,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
-import com.dani.jarzy.data.JarzyDatabase
 import com.dani.jarzy.data.Quest
+import com.dani.jarzy.data.QuestRepository
 import com.dani.jarzy.data.SavingsCategory
+import com.dani.jarzy.data.SavingsCategoryRepository
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -62,7 +63,11 @@ private enum class ChildTab {
  */
 class ChildHomeActivity : AppCompatActivity() {
 
-    private lateinit var database: JarzyDatabase
+    // Replaces the old JarzyDatabase (Room) reference - see SavingsCategoryRepository/
+    // QuestRepository's own class comments for how they mirror the old DAOs' methods
+    // against Firestore instead.
+    private val savingsCategoryRepository = SavingsCategoryRepository()
+    private val questRepository = QuestRepository()
     private var childId: Long = -1L
 
     // This child's own savings categories, in the same order the cube carousel shows
@@ -98,8 +103,6 @@ class ChildHomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_child_home)
-
-        database = JarzyDatabase.getDatabase(this)
 
         val childUsername = intent.getStringExtra("CHILD_USERNAME") ?: ""
         childId = intent.getLongExtra("CHILD_ID", -1L)
@@ -174,7 +177,7 @@ class ChildHomeActivity : AppCompatActivity() {
                 }
 
                 lifecycleScope.launch {
-                    database.savingsCategoryDao().insert(SavingsCategory(childId = childId, name = name, amountSaved = 0.0))
+                    savingsCategoryRepository.insert(SavingsCategory(childId = childId, name = name, amountSaved = 0.0))
                     Toast.makeText(this@ChildHomeActivity, "Category added!", Toast.LENGTH_SHORT).show()
                     refreshCategories()
                 }
@@ -193,7 +196,7 @@ class ChildHomeActivity : AppCompatActivity() {
 
             showCategoryNameDialog(title = "Edit Category", existingName = selected.name) { name ->
                 lifecycleScope.launch {
-                    database.savingsCategoryDao().update(selected.copy(name = name))
+                    savingsCategoryRepository.update(selected.copy(name = name))
                     Toast.makeText(this@ChildHomeActivity, "Category updated!", Toast.LENGTH_SHORT).show()
                     refreshCategories()
                 }
@@ -245,20 +248,20 @@ class ChildHomeActivity : AppCompatActivity() {
                         if (selected.amountSaved > 0) {
                             val generalCategory = categories.firstOrNull { it.name.equals("General", ignoreCase = true) }
                             if (generalCategory != null) {
-                                database.savingsCategoryDao().update(
+                                savingsCategoryRepository.update(
                                     generalCategory.copy(amountSaved = generalCategory.amountSaved + selected.amountSaved)
                                 )
                             } else {
                                 // Defensive fallback - every child should already have a
                                 // General category, but create one if it's somehow missing
                                 // rather than silently losing this money.
-                                database.savingsCategoryDao().insert(
+                                savingsCategoryRepository.insert(
                                     SavingsCategory(childId = childId, name = "General", amountSaved = selected.amountSaved)
                                 )
                             }
                         }
 
-                        database.savingsCategoryDao().delete(selected)
+                        savingsCategoryRepository.delete(selected)
                         Toast.makeText(this@ChildHomeActivity, "Category deleted.", Toast.LENGTH_SHORT).show()
                         refreshCategories()
                     }
@@ -344,7 +347,7 @@ class ChildHomeActivity : AppCompatActivity() {
     // other money-related action on this screen already respects.
     private fun onQuestCheckToggled(quest: Quest, isChecked: Boolean) {
         lifecycleScope.launch {
-            database.questDao().update(quest.copy(isChecked = isChecked))
+            questRepository.update(quest.copy(isChecked = isChecked))
             refreshQuests()
         }
     }
@@ -356,12 +359,12 @@ class ChildHomeActivity : AppCompatActivity() {
     // for quests instead of categories.
     private suspend fun refreshQuests() {
         val today = Calendar.getInstance()
-        val loaded = database.questDao().getQuestsForChild(childId)
+        val loaded = questRepository.getQuestsForChild(childId)
 
         val resetQuests = loaded.map { quest ->
             val reset = QuestScheduler.resetIfNeeded(quest, today)
             if (reset !== quest) {
-                database.questDao().update(reset)
+                questRepository.update(reset)
             }
             reset
         }
@@ -385,7 +388,7 @@ class ChildHomeActivity : AppCompatActivity() {
     // on the parent's side.
     private fun refreshCategories() {
         lifecycleScope.launch {
-            categories = database.savingsCategoryDao().getCategoriesForChild(childId)
+            categories = savingsCategoryRepository.getCategoriesForChild(childId)
 
             // Balance is calculated by adding up every category's amountSaved, not
             // stored as its own number - one source of truth for how much the child has
