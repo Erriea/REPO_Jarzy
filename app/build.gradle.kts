@@ -72,4 +72,13 @@ dependencies {
     // suffix) already brings in the Kotlin-friendly API.
     implementation(platform("com.google.firebase:firebase-bom:35.0.2"))
     implementation("com.google.firebase:firebase-firestore")
+
+    // Firestore's own API hands back a Task (a callback-based result), not a Kotlin
+    // suspend function - this tiny library adds a single .await() extension function
+    // that turns any Task into something a suspend function can just wait for, the
+    // same way every Room DAO call already could. Without this, every single
+    // Firestore call in the app would need to be rewritten with nested
+    // .addOnSuccessListener {} callbacks instead of the straight-line suspend code
+    // already used everywhere (Kotlin, n.d.).
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.11.0")
 }
