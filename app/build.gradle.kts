@@ -80,5 +80,5 @@ dependencies {
     // Firestore call in the app would need to be rewritten with nested
     // .addOnSuccessListener {} callbacks instead of the straight-line suspend code
     // already used everywhere (Kotlin, n.d.).
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
 }
