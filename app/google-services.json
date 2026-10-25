@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "343884467269",
+    "project_id": "jarzy-c2318",
+    "storage_bucket": "jarzy-c2318.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343884467269:android:9ba6cf0c1e449774f3272c",
+        "android_client_info": {
+          "package_name": "com.dani.jarzy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkl7WiHq6T-n_nmQWi1KEOoEQUMCvrJTg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
