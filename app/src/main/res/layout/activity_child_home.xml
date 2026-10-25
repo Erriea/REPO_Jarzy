@@ -176,6 +176,43 @@
 
                 </FrameLayout>
 
+                <TextView
+                    android:fontFamily="@font/comic_relief_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="This Month's Spending"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:layout_marginTop="28dp" />
+
+                <!-- Half-circle "speedometer" gauge - ChildHomeActivity.setUpMonthlyGauge()/
+                     updateMonthlyGauge() build it. White background for the same contrast
+                     reason chartCategoryTotals got one in activity_expense_history.xml -
+                     this chart is otherwise transparent and would blend into this screen's
+                     purple background. Shorter than a full-circle chart would need since
+                     only the top half is ever drawn. -->
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/chartMonthlyGauge"
+                    android:layout_width="match_parent"
+                    android:layout_height="170dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/white"
+                    android:padding="8dp" />
+
+                <!-- Plain-text colour key, since a bare gauge with no labels isn't
+                     self-explanatory - fills in with the actual min/max numbers each
+                     reload in updateMonthlyGauge(). -->
+                <TextView
+                    android:id="@+id/tvMonthlyGaugeLegend"
+                    android:fontFamily="@font/comic_relief_regular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:layout_marginTop="6dp" />
+
                 <Button
                     android:id="@+id/btnAddExpense"
                     android:fontFamily="@font/comic_relief_bold"

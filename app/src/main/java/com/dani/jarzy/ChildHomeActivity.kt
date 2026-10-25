@@ -18,10 +18,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
+import com.dani.jarzy.data.ChildRepository
+import com.dani.jarzy.data.ExpenseRepository
 import com.dani.jarzy.data.Quest
 import com.dani.jarzy.data.QuestRepository
 import com.dani.jarzy.data.SavingsCategory
 import com.dani.jarzy.data.SavingsCategoryRepository
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -60,6 +66,12 @@ private enum class ChildTab {
  * parent adding to their balance, logging an expense, the "Move Money Between
  * Categories" transfer screen, or the parent confirming a completed quest - none of
  * which this screen lets a child short-circuit themselves.
+ *
+ * The Stats tab also shows an MPAndroidChart half-circle gauge (chartMonthlyGauge) -
+ * this child's total spend so far THIS calendar month, against their minMonthlySpend/
+ * maxMonthlySpend set at registration, with a small purple marker showing exactly where
+ * that total currently sits. See setUpMonthlyGauge()/refreshMonthlyGauge()/
+ * updateMonthlyGauge() below.
  */
 class ChildHomeActivity : AppCompatActivity() {
 
@@ -68,6 +80,13 @@ class ChildHomeActivity : AppCompatActivity() {
     // against Firestore instead.
     private val savingsCategoryRepository = SavingsCategoryRepository()
     private val questRepository = QuestRepository()
+
+    // Both added only to power the "This Month's Spending" gauge on the Stats tab -
+    // childRepository reads minMonthlySpend/maxMonthlySpend, expenseRepository (which
+    // needs savingsCategoryRepository passed in - see its own class comment) sums this
+    // child's expenses for the current calendar month.
+    private val childRepository = ChildRepository()
+    private val expenseRepository = ExpenseRepository(savingsCategoryRepository)
     private var childId: Long = -1L
 
     // This child's own savings categories, in the same order the cube carousel shows
@@ -83,6 +102,8 @@ class ChildHomeActivity : AppCompatActivity() {
 
     private lateinit var tvSavingsTotal: TextView
     private lateinit var tvSavingsBreakdown: TextView
+    private lateinit var chartMonthlyGauge: PieChart
+    private lateinit var tvMonthlyGaugeLegend: TextView
 
     private lateinit var btnTabStats: MaterialButton
     private lateinit var btnTabCategories: MaterialButton
@@ -110,6 +131,9 @@ class ChildHomeActivity : AppCompatActivity() {
         val tvChildWelcome = findViewById<TextView>(R.id.tvChildWelcome)
         tvSavingsTotal = findViewById(R.id.tvSavingsTotal)
         tvSavingsBreakdown = findViewById(R.id.tvSavingsBreakdown)
+        chartMonthlyGauge = findViewById(R.id.chartMonthlyGauge)
+        tvMonthlyGaugeLegend = findViewById(R.id.tvMonthlyGaugeLegend)
+        setUpMonthlyGauge()
 
         btnTabStats = findViewById(R.id.btnTabStats)
         btnTabCategories = findViewById(R.id.btnTabCategories)
@@ -307,6 +331,7 @@ class ChildHomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         refreshCategories()
+        refreshMonthlyGauge()
         lifecycleScope.launch { refreshQuests() }
     }
 
@@ -413,6 +438,138 @@ class ChildHomeActivity : AppCompatActivity() {
         }
     }
 
+    // One-time gauge setup, called once from onCreate() - exactly the same split
+    // ExpenseHistoryActivity uses for its own chart (setUpChart() for one-time styling,
+    // updateCategoryChart() for the data that changes every reload). This is the styling
+    // half; updateMonthlyGauge() below is the data half.
+    private fun setUpMonthlyGauge() {
+        chartMonthlyGauge.description.isEnabled = false
+        chartMonthlyGauge.legend.isEnabled = false // tvMonthlyGaugeLegend (plain text) explains the colours instead
+        chartMonthlyGauge.setDrawEntryLabels(false) // no text crowded onto the thin slices themselves
+        chartMonthlyGauge.setTouchEnabled(false) // a read-only indicator, not something to drag/rotate
+
+        // setMaxAngle(180f) is MPAndroidChart's own documented way to draw a half pie
+        // instead of a full circle (PhilJay, n.d.). rotationAngle=180f then positions
+        // that half starting at the left (9 o'clock) and sweeping up and over to the
+        // right (3 o'clock) - the usual "dome on top, flat on the bottom" speedometer
+        // shape, rather than some other quarter or half of the circle.
+        chartMonthlyGauge.maxAngle = 180f
+        chartMonthlyGauge.rotationAngle = 180f
+
+        chartMonthlyGauge.isDrawHoleEnabled = true
+        chartMonthlyGauge.holeRadius = 65f
+        chartMonthlyGauge.setHoleColor(ContextCompat.getColor(this, R.color.white))
+        chartMonthlyGauge.setCenterTextColor(ContextCompat.getColor(this, R.color.jarzy_purple))
+        chartMonthlyGauge.setCenterTextSize(15f)
+    }
+
+    // Reloads how much this child has spent so far THIS CALENDAR MONTH (every category
+    // combined - unlike ExpenseHistoryActivity's chart, there's no date range picker
+    // here, it's always "this month so far") and this child's minMonthlySpend/
+    // maxMonthlySpend, then hands all three to updateMonthlyGauge() to actually redraw
+    // the gauge. Pulled into its own function, called from onResume() alongside
+    // refreshCategories()/refreshQuests(), rather than folded into either of those -
+    // this is its own independent piece of data, not really "categories" or "quests".
+    private fun refreshMonthlyGauge() {
+        lifecycleScope.launch {
+            val child = childRepository.getById(childId)
+
+            val monthStart = Calendar.getInstance()
+            monthStart.set(Calendar.DAY_OF_MONTH, 1)
+            monthStart.set(Calendar.HOUR_OF_DAY, 0)
+            monthStart.set(Calendar.MINUTE, 0)
+            monthStart.set(Calendar.SECOND, 0)
+            monthStart.set(Calendar.MILLISECOND, 0)
+
+            val monthEnd = Calendar.getInstance()
+            monthEnd.set(Calendar.HOUR_OF_DAY, 23)
+            monthEnd.set(Calendar.MINUTE, 59)
+            monthEnd.set(Calendar.SECOND, 59)
+            monthEnd.set(Calendar.MILLISECOND, 999)
+
+            val expensesThisMonth = expenseRepository.getExpensesInRange(
+                childId, monthStart.timeInMillis, monthEnd.timeInMillis
+            )
+            val currentSpend = expensesThisMonth.sumOf { it.amount }
+
+            updateMonthlyGauge(currentSpend, child?.minMonthlySpend ?: 0.0, child?.maxMonthlySpend ?: 0.0)
+        }
+    }
+
+    // Builds the gauge's coloured background bands (amber = under the monthly minimum,
+    // green = on track, red/pink = over the monthly maximum) plus a thin purple "you are
+    // here" marker sliver at the current spend's exact position - MPAndroidChart's
+    // PieChart has no built-in needle, so this marker is just a short, differently-
+    // coloured segment inserted at the right spot instead, the same slice-based approach
+    // the rest of the chart already uses.
+    //
+    // A maxMonthlySpend of 0.0 means "no max was set" (same convention
+    // updateCategoryChart() in ExpenseHistoryActivity already uses for its own min/max
+    // lines) - everything above the minimum just counts as "on track" rather than ever
+    // showing red, since there's no real ceiling to compare against.
+    private fun updateMonthlyGauge(currentSpend: Double, minSpend: Double, maxSpend: Double) {
+        // Always covers the current spend AND the max target, with 20% headroom so
+        // neither sits flush against the very end of the arc. The "10.0" fallback only
+        // ever applies if spend, min and max are ALL still zero (a brand new child with
+        // no data yet) - without it, ceiling would be 0 and the whole gauge would
+        // collapse to a zero-width arc instead of drawing a sensible empty one.
+        val ceiling = (maxOf(currentSpend, minSpend, maxSpend) * 1.2).let { if (it > 0.0) it else 10.0 }
+
+        val clampedMin = minSpend.coerceIn(0.0, ceiling)
+        val clampedMax = maxSpend.coerceIn(0.0, ceiling)
+
+        // A thin marker sliver, 2% of the whole scale wide, centred on currentSpend.
+        val markerHalfWidth = ceiling * 0.01
+        val markerStart = (currentSpend - markerHalfWidth).coerceIn(0.0, ceiling)
+        val markerEnd = (currentSpend + markerHalfWidth).coerceIn(0.0, ceiling)
+
+        // Every point where the arc needs to change colour - the three zone edges plus
+        // the marker's own two edges, sorted and de-duplicated. distinct() means two
+        // boundaries landing on the same value (a very normal case - e.g. a brand new
+        // child where min, max and spend are all 0) just collapse into one point rather
+        // than creating a zero-width segment.
+        val boundaries = listOf(0.0, clampedMin, clampedMax, ceiling, markerStart, markerEnd)
+            .sorted()
+            .distinct()
+
+        val entries = mutableListOf<PieEntry>()
+        val colors = mutableListOf<Int>()
+
+        for (i in 0 until boundaries.size - 1) {
+            val segmentStart = boundaries[i]
+            val segmentEnd = boundaries[i + 1]
+            val width = segmentEnd - segmentStart
+            if (width <= 0.0) continue
+
+            val midpoint = (segmentStart + segmentEnd) / 2.0
+            val color = when {
+                midpoint in markerStart..markerEnd ->
+                    ContextCompat.getColor(this, R.color.jarzy_purple) // the "you are here" marker
+                midpoint < clampedMin ->
+                    ContextCompat.getColor(this, R.color.cube_amber) // under the monthly minimum
+                midpoint < clampedMax || maxSpend <= 0.0 ->
+                    ContextCompat.getColor(this, R.color.cube_green) // on track
+                else ->
+                    ContextCompat.getColor(this, R.color.cube_pink) // over the monthly maximum
+            }
+
+            entries.add(PieEntry(width.toFloat()))
+            colors.add(color)
+        }
+
+        val dataSet = PieDataSet(entries, "")
+        dataSet.colors = colors
+        dataSet.setDrawValues(false) // colour bands only - no numbers crowded onto the slices
+        dataSet.sliceSpace = 0f
+
+        chartMonthlyGauge.data = PieData(dataSet)
+        chartMonthlyGauge.centerText = "Spent\n%.2f".format(currentSpend)
+        chartMonthlyGauge.invalidate()
+
+        tvMonthlyGaugeLegend.text = "Amber: under min (%.2f)   Green: on track   Red: over max (%.2f)"
+            .format(minSpend, maxSpend)
+    }
+
     // Shared by "Add New Category" and "Edit Category" - both need the same single-field
     // popup (just a name box), unlike the parent's version of this dialog which also
     // collects an amount - a child's category amount is never set through this dialog.
@@ -461,3 +618,6 @@ class ChildHomeActivity : AppCompatActivity() {
 // Android Developers, n.d.-c. RecyclerView.LinearLayoutManager [Webpage]. Available at:
 //     https://developer.android.com/reference/androidx/recyclerview/widget/LinearLayoutManager
 //     [Accessed 18 October 2026].
+// PhilJay, n.d. Specific Chart Settings & Styling [Webpage]. Available at:
+//     https://github.com/PhilJay/MPAndroidChart/wiki/Specific-Chart-Settings-&-Styling
+//     [Accessed 25 October 2026].
