@@ -81,4 +81,12 @@ dependencies {
     // .addOnSuccessListener {} callbacks instead of the straight-line suspend code
     // already used everywhere (Kotlin, n.d.).
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+
+    // MPAndroidChart draws the spend-per-category bar graph (with the min/max monthly
+    // spend lines overlaid) on ExpenseHistoryActivity's "Category Totals" view. v3.1.0 is
+    // the last version published directly under the original "PhilJay" JitPack
+    // coordinate - still the version almost every up-to-date tutorial and Stack Overflow
+    // answer uses, and it resolves fine against this project's AGP/Kotlin setup
+    // (JitPack, n.d.).
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

@@ -14,9 +14,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
+import com.dani.jarzy.data.CategoryTotal
+import com.dani.jarzy.data.ChildRepository
 import com.dani.jarzy.data.Expense
 import com.dani.jarzy.data.ExpenseRepository
+import com.dani.jarzy.data.SavingsCategory
 import com.dani.jarzy.data.SavingsCategoryRepository
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.LimitLine
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -45,6 +55,12 @@ private enum class HistoryViewMode {
  * The date range defaults to "start of this month" -> "today" when the screen first
  * opens, and can be narrowed with the Start Date / End Date buttons, which reuse the
  * same DatePickerDialog pattern as AddExpenseActivity's date picker (Chavan, 2023).
+ *
+ * "Category Totals" mode also draws an MPAndroidChart bar graph (chartCategoryTotals) -
+ * one bar per savings category for the selected range - with this child's
+ * minMonthlySpend/maxMonthlySpend drawn across it as two reference lines, so it's
+ * immediately visible whether the selected range's spending sits inside, above or below
+ * that child's monthly target range. See setUpChart()/updateCategoryChart() below.
  */
 class ExpenseHistoryActivity : AppCompatActivity() {
 
@@ -54,11 +70,16 @@ class ExpenseHistoryActivity : AppCompatActivity() {
     // collections now that Firestore has no JOIN to do that in one query).
     private val savingsCategoryRepository = SavingsCategoryRepository()
     private val expenseRepository = ExpenseRepository(savingsCategoryRepository)
+
+    // Needed only to read this child's minMonthlySpend/maxMonthlySpend, so the category
+    // totals graph can draw those two values as reference lines (see loadExpenseHistory()).
+    private val childRepository = ChildRepository()
     private var childId: Long = -1L
 
     private lateinit var tvExpenseHistoryTotal: TextView
     private lateinit var llExpenseEntries: LinearLayout
     private lateinit var tvExpenseHistoryBreakdown: TextView
+    private lateinit var chartCategoryTotals: BarChart
     private lateinit var btnStartDate: Button
     private lateinit var btnEndDate: Button
     private lateinit var btnToggleView: Button
@@ -86,6 +107,8 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         tvExpenseHistoryTotal = findViewById(R.id.tvExpenseHistoryTotal)
         llExpenseEntries = findViewById(R.id.llExpenseEntries)
         tvExpenseHistoryBreakdown = findViewById(R.id.tvExpenseHistoryBreakdown)
+        chartCategoryTotals = findViewById(R.id.chartCategoryTotals)
+        setUpChart()
         btnStartDate = findViewById(R.id.btnStartDate)
         btnEndDate = findViewById(R.id.btnEndDate)
         btnToggleView = findViewById(R.id.btnToggleView)
@@ -211,6 +234,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
             if (categories.isEmpty()) {
                 tvExpenseHistoryTotal.text = "Total Spent: 0.00"
                 llExpenseEntries.visibility = View.GONE
+                chartCategoryTotals.visibility = View.GONE
                 tvExpenseHistoryBreakdown.visibility = View.VISIBLE
                 tvExpenseHistoryBreakdown.text = "No savings categories yet."
                 return@launch
@@ -219,6 +243,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
             when (viewMode) {
                 HistoryViewMode.ALL_ENTRIES -> {
                     llExpenseEntries.visibility = View.VISIBLE
+                    chartCategoryTotals.visibility = View.GONE
                     tvExpenseHistoryBreakdown.visibility = View.GONE
 
                     val expenses = expenseRepository.getExpensesInRange(childId, startDateMillis, endDateMillis)
@@ -271,6 +296,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
 
                 HistoryViewMode.CATEGORY_TOTALS -> {
                     llExpenseEntries.visibility = View.GONE
+                    chartCategoryTotals.visibility = View.VISIBLE
                     tvExpenseHistoryBreakdown.visibility = View.VISIBLE
 
                     // getTotalsPerSavingsCategory() does the summing itself, so this view
@@ -292,9 +318,89 @@ class ExpenseHistoryActivity : AppCompatActivity() {
                         breakdown.append("${category.name}: %.2f\n".format(categoryTotal))
                     }
                     tvExpenseHistoryBreakdown.text = breakdown.toString().trim()
+
+                    // child is fetched fresh here (same "always re-read from Firestore,
+                    // never rely on a value cached earlier" pattern the rest of the app's
+                    // repositories already use) purely to read minMonthlySpend/
+                    // maxMonthlySpend for the two reference lines drawn across the graph.
+                    val child = childRepository.getById(childId)
+                    updateCategoryChart(categories, totalsByCategory, child?.minMonthlySpend ?: 0.0, child?.maxMonthlySpend ?: 0.0)
                 }
             }
         }
+    }
+
+    // One-time chart setup, called once from onCreate() - styling and behaviour that
+    // never changes between reloads (colours, disabling the right-hand axis, etc.) lives
+    // here, kept separate from updateCategoryChart() below which runs every reload and
+    // only touches the data itself (MPAndroidChart, n.d.).
+    private fun setUpChart() {
+        chartCategoryTotals.description.isEnabled = false // no small caption under the chart
+        chartCategoryTotals.setFitBars(true)
+        chartCategoryTotals.legend.textColor = ContextCompat.getColor(this, R.color.white)
+        chartCategoryTotals.axisRight.isEnabled = false // only the left axis is needed
+
+        chartCategoryTotals.axisLeft.textColor = ContextCompat.getColor(this, R.color.white)
+        chartCategoryTotals.axisLeft.axisMinimum = 0f // spending can never be negative
+
+        chartCategoryTotals.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        chartCategoryTotals.xAxis.textColor = ContextCompat.getColor(this, R.color.white)
+        chartCategoryTotals.xAxis.granularity = 1f // one label per bar, never a fraction
+        chartCategoryTotals.xAxis.setDrawGridLines(false)
+    }
+
+    // Rebuilds the bar chart from this reload's category totals, and draws two
+    // horizontal reference lines across the whole chart for this child's
+    // minMonthlySpend/maxMonthlySpend (set back in RegisterChildActivity) - so at a
+    // glance you can see both how spending breaks down by category AND whether the
+    // total for this range falls inside, above or below that monthly target range.
+    // A limit of 0.0 (the Room/Firestore default for a field that was never set) is
+    // skipped entirely, rather than drawing a misleading line at zero.
+    private fun updateCategoryChart(
+        categories: List<SavingsCategory>,
+        totalsByCategory: Map<Long, CategoryTotal>,
+        minMonthlySpend: Double,
+        maxMonthlySpend: Double
+    ) {
+        val entries = categories.mapIndexed { index, category ->
+            val spent = totalsByCategory[category.savingsCategoryId]?.totalSpent ?: 0.0
+            BarEntry(index.toFloat(), spent.toFloat())
+        }
+
+        val dataSet = BarDataSet(entries, "Spent per category")
+        dataSet.color = ContextCompat.getColor(this, R.color.jarzy_blue)
+        dataSet.valueTextColor = ContextCompat.getColor(this, R.color.white)
+
+        chartCategoryTotals.data = BarData(dataSet)
+
+        // IndexAxisValueFormatter maps each whole-number x position (0, 1, 2...) back to
+        // the matching category name, so the x-axis reads "Clothes", "Games" etc.
+        // instead of plain numbers (MPAndroidChart, n.d.).
+        chartCategoryTotals.xAxis.valueFormatter = IndexAxisValueFormatter(categories.map { it.name })
+        chartCategoryTotals.xAxis.labelCount = categories.size
+
+        // removeAllLimitLines() first, same reason llExpenseEntries.removeAllViews() is
+        // needed above - otherwise every reload would stack more lines on top of the
+        // last set instead of replacing them.
+        chartCategoryTotals.axisLeft.removeAllLimitLines()
+
+        if (minMonthlySpend > 0.0) {
+            val minLine = LimitLine(minMonthlySpend.toFloat(), "Min: %.2f".format(minMonthlySpend))
+            minLine.lineColor = ContextCompat.getColor(this, R.color.white)
+            minLine.textColor = ContextCompat.getColor(this, R.color.white)
+            minLine.lineWidth = 1.5f
+            chartCategoryTotals.axisLeft.addLimitLine(minLine)
+        }
+
+        if (maxMonthlySpend > 0.0) {
+            val maxLine = LimitLine(maxMonthlySpend.toFloat(), "Max: %.2f".format(maxMonthlySpend))
+            maxLine.lineColor = ContextCompat.getColor(this, R.color.cube_orange)
+            maxLine.textColor = ContextCompat.getColor(this, R.color.white)
+            maxLine.lineWidth = 1.5f
+            chartCategoryTotals.axisLeft.addLimitLine(maxLine)
+        }
+
+        chartCategoryTotals.invalidate() // redraws the chart with everything set above
     }
 
     // Inflates one item_expense_entry row for a single expense and adds it to
@@ -385,3 +491,10 @@ class ExpenseHistoryActivity : AppCompatActivity() {
 // Android Developers, 2026.-d. ResourcesCompat [Webpage]. Available at:
 //     https://developer.android.com/reference/androidx/core/content/res/ResourcesCompat
 //     [Accessed 14 September 2026].
+
+// MPAndroidChart, n.d. Getting Started [Webpage]. Available at:
+//     https://github.com/PhilJay/MPAndroidChart/wiki/Getting-Started
+//     [Accessed 25 October 2026].
+
+// JitPack, n.d. JitPack - Easy to use package repository for Maven, Gradle and sbt
+// projects [Webpage]. Available at: https://jitpack.io/ [Accessed 25 October 2026].

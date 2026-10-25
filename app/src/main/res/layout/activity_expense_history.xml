@@ -136,6 +136,17 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
 
+                <!-- chartCategoryTotals only shows in "Category Totals" view mode, same
+                     visibility toggle as llExpenseEntries/tvExpenseHistoryBreakdown above.
+                     Fixed height (rather than wrap_content) because BarChart needs a real
+                     pixel size to lay out its bars and axes in - it can't size itself to
+                     its content the way a TextView can (MPAndroidChart, n.d.). -->
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/chartCategoryTotals"
+                    android:layout_width="match_parent"
+                    android:layout_height="260dp"
+                    android:layout_marginBottom="12dp" />
+
                 <TextView
                     android:id="@+id/tvExpenseHistoryBreakdown"
                     android:fontFamily="@font/comic_relief_regular"
