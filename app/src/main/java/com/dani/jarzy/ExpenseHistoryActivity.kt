@@ -377,6 +377,28 @@ class ExpenseHistoryActivity : AppCompatActivity() {
 
         chartCategoryTotals.data = BarData(dataSet)
 
+        // MPAndroidChart only auto-scales the Y axis to fit the BAR values, not the limit
+        // lines below - so a min/max line taller than every bar (a totally normal case:
+        // a child who hasn't come close to their monthly max yet) gets drawn above the
+        // visible chart area and never actually appears, even though the line itself was
+        // added correctly. Explicitly stretching axisMaximum to cover whichever is
+        // tallest - the biggest bar, the min line, or the max line - with a little extra
+        // headroom (* 1.15f) so the top line isn't pinned right against the edge, is what
+        // actually keeps both lines on screen (PhilJay, n.d.). resetAxisMaximum() falls
+        // back to the normal auto-sizing for the one edge case where everything (every
+        // bar, min and max) is genuinely zero, so that empty state doesn't draw a
+        // broken-looking flat line at the very top instead.
+        val tallestValue = maxOf(
+            entries.maxOfOrNull { it.y } ?: 0f,
+            minMonthlySpend.toFloat(),
+            maxMonthlySpend.toFloat()
+        )
+        if (tallestValue > 0f) {
+            chartCategoryTotals.axisLeft.axisMaximum = tallestValue * 1.15f
+        } else {
+            chartCategoryTotals.axisLeft.resetAxisMaximum()
+        }
+
         // IndexAxisValueFormatter maps each whole-number x position (0, 1, 2...) back to
         // the matching category name, so the x-axis reads "Clothes", "Games" etc.
         // instead of plain numbers (MPAndroidChart, n.d.).
@@ -502,3 +524,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
 
 // JitPack, n.d. JitPack - Easy to use package repository for Maven, Gradle and sbt
 // projects [Webpage]. Available at: https://jitpack.io/ [Accessed 25 October 2026].
+
+// PhilJay, n.d. The Axis [Webpage]. Available at:
+//     https://github.com/PhilJay/MPAndroidChart/wiki/The-Axis
+//     [Accessed 25 October 2026].
