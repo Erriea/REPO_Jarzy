@@ -90,6 +90,17 @@ class AddExpenseActivity : AppCompatActivity() {
                 { _, year, month, dayOfMonth ->
                     val picked = Calendar.getInstance()
                     picked.set(year, month, dayOfMonth, 0, 0, 0)
+                    // The 6-argument set() above only touches YEAR/MONTH/DAY_OF_MONTH/
+                    // HOUR_OF_DAY/MINUTE/SECOND - it leaves MILLISECOND exactly as
+                    // Calendar.getInstance() found it (whatever millisecond-of-second it
+                    // happened to be when this callback ran, 0-999). That leftover
+                    // millisecond pushed "today" very slightly past exact midnight, which
+                    // was just enough to fail the dateMillis > todayMidnight.timeInMillis
+                    // check below (todayMidnight zeroes its own MILLISECOND explicitly) -
+                    // falsely rejecting today's own date as "in the future" by a fraction
+                    // of a second. Zeroing it here too keeps both sides of that comparison
+                    // on the exact same footing (Gonzalez, 2025).
+                    picked.set(Calendar.MILLISECOND, 0)
                     selectedDateMillis = picked.timeInMillis
                     btnPickDate.text = "Date: %04d-%02d-%02d".format(year, month + 1, dayOfMonth)
                 },
