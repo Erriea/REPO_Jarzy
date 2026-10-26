@@ -338,6 +338,18 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         chartCategoryTotals.description.isEnabled = false // no small caption under the chart
         chartCategoryTotals.setFitBars(true)
 
+        // MPAndroidChart shows this exact text by itself, automatically, whenever
+        // chart.data is null at the moment it draws (e.g. a brief instant right after
+        // switching to this view, before loadExpenseHistory()'s Firestore reads below
+        // have returned) - its own default wording ("No chart data available.") gives
+        // no hint of WHY, so it reads like something is broken even when it's just
+        // mid-load. Overriding it with a clearer message, styled to match the rest of
+        // this screen's text, so if it's ever still showing once the load has actually
+        // finished, it's self-explanatory rather than looking like an error
+        // (MPAndroidChart, n.d.).
+        chartCategoryTotals.setNoDataText("No expenses logged yet for this child in this date range.")
+        chartCategoryTotals.setNoDataTextColor(ContextCompat.getColor(this, R.color.jarzy_blue))
+
         // jarzy_blue everywhere below - the chart has a white background (set in
         // activity_expense_history.xml) so it needs dark text, not the white text the
         // rest of this screen uses on its own blue background.
@@ -426,6 +438,12 @@ class ExpenseHistoryActivity : AppCompatActivity() {
             chartCategoryTotals.axisLeft.addLimitLine(maxLine)
         }
 
+        // Belt-and-braces: chart.data = BarData(...) above already triggers an internal
+        // notifyDataSetChanged() on its own, but calling it again explicitly here, right
+        // before invalidate(), is the standard fix the MPAndroidChart wiki/community
+        // recommend whenever a chart has looked stuck on its "no data" state despite
+        // data genuinely being set - costs nothing to call twice (MPAndroidChart, n.d.).
+        chartCategoryTotals.notifyDataSetChanged()
         chartCategoryTotals.invalidate() // redraws the chart with everything set above
     }
 
