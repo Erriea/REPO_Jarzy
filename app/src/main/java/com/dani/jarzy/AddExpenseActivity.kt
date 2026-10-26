@@ -156,19 +156,51 @@ class AddExpenseActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val selectedCategory = categories[categoryIndex]
+            val pickedCategory = categories[categoryIndex]
+            tvExpenseError.text = ""
 
-            // The cap: an expense can never draw more out of a category than it currently holds.
-            if (amount > selectedCategory.amountSaved) {
-                tvExpenseError.text = "That category only has %.2f available.".format(selectedCategory.amountSaved)
-                return@setOnClickListener
-            }
+            // Disabled the instant a save is attempted, instead of only after the cap
+            // check below finishes - this is what actually stops a second, impatient
+            // tap (while the first save is still in flight) from launching a SECOND
+            // coroutine that reads this same category's balance before the first one
+            // has finished writing its deduction. Without this, two taps fired close
+            // together would both check against - and both compute their new balance
+            // from - the exact same starting amount, since neither tap would yet have
+            // seen the other's update: a textbook stale-read race condition, and
+            // exactly how this screen was letting someone spend more than a category
+            // actually held.
+            btnSaveExpense.isEnabled = false
 
             lifecycleScope.launch {
+                // Re-read this exact category fresh from Firestore right here, instead
+                // of trusting "categories" - the list this screen loaded once back in
+                // onResume() and never since. If the user has already logged another
+                // expense from this same category earlier in this same visit to this
+                // screen (without leaving and returning, the only thing that would
+                // normally trigger a reload), that cached copy's amountSaved is stale -
+                // checking the spending cap below against a stale, too-high balance is
+                // exactly how it could be passed even though the category had already
+                // run out of money.
+                val freshCategory = savingsCategoryRepository.getById(pickedCategory.savingsCategoryId)
+                if (freshCategory == null) {
+                    tvExpenseError.text = "That category no longer exists - go back and try again."
+                    btnSaveExpense.isEnabled = true
+                    return@launch
+                }
+
+                // The cap: an expense can never draw more out of a category than it
+                // currently holds - checked here, against freshCategory, rather than
+                // back in the synchronous click handler against a possibly-stale copy.
+                if (amount > freshCategory.amountSaved) {
+                    tvExpenseError.text = "That category only has %.2f available.".format(freshCategory.amountSaved)
+                    btnSaveExpense.isEnabled = true
+                    return@launch
+                }
+
                 expenseRepository.insert(
                     Expense(
                         childId = childId,
-                        savingsCategoryId = selectedCategory.savingsCategoryId,
+                        savingsCategoryId = freshCategory.savingsCategoryId,
                         amount = amount,
                         date = dateMillis,
                         description = description,
@@ -179,7 +211,7 @@ class AddExpenseActivity : AppCompatActivity() {
                 // Recording the expense deducts it from the category it was spent from
                 // the same pattern CreateSavingsCategoryActivity uses for its source category.
                 savingsCategoryRepository.update(
-                    selectedCategory.copy(amountSaved = selectedCategory.amountSaved - amount)
+                    freshCategory.copy(amountSaved = freshCategory.amountSaved - amount)
                 )
 
                 // Overspending warning - separate from (and never blocks) the hard cap
@@ -189,7 +221,7 @@ class AddExpenseActivity : AppCompatActivity() {
                 // (the money might genuinely be there), it just gets flagged so the parent
                 // notices. A budgetSize of 0 means no budget was set, so this check is
                 // skipped entirely for that category.
-                if (selectedCategory.budgetSize > 0) {
+                if (freshCategory.budgetSize > 0) {
                     val monthStart = Calendar.getInstance()
                     monthStart.timeInMillis = dateMillis
                     monthStart.set(Calendar.DAY_OF_MONTH, 1)
@@ -215,14 +247,14 @@ class AddExpenseActivity : AppCompatActivity() {
                     val monthTotals = expenseRepository
                         .getTotalsPerSavingsCategory(childId, monthStart.timeInMillis, monthEnd.timeInMillis)
                     val spentThisMonth = monthTotals
-                        .firstOrNull { it.categoryId == selectedCategory.savingsCategoryId }
+                        .firstOrNull { it.categoryId == freshCategory.savingsCategoryId }
                         ?.totalSpent ?: 0.0
 
-                    if (spentThisMonth > selectedCategory.budgetSize) {
+                    if (spentThisMonth > freshCategory.budgetSize) {
                         Toast.makeText(
                             this@AddExpenseActivity,
-                            "Heads up: ${selectedCategory.name} is now %.2f over its %.2f monthly budget."
-                                .format(spentThisMonth - selectedCategory.budgetSize, selectedCategory.budgetSize),
+                            "Heads up: ${freshCategory.name} is now %.2f over its %.2f monthly budget."
+                                .format(spentThisMonth - freshCategory.budgetSize, freshCategory.budgetSize),
                             Toast.LENGTH_LONG
                         ).show()
                     }

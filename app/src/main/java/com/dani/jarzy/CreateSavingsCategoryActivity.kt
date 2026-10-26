@@ -65,9 +65,9 @@ class CreateSavingsCategoryActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val sourceCategory = categories[fromIndex]
+            val pickedSourceCategory = categories[fromIndex]
 
-            if (sourceCategory.name.equals(destinationName, ignoreCase = true)) {
+            if (pickedSourceCategory.name.equals(destinationName, ignoreCase = true)) {
                 tvGoalError.text = "Choose a different destination category."
                 return@setOnClickListener
             }
@@ -78,21 +78,51 @@ class CreateSavingsCategoryActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // The cap: can't move more out of a category than it currently holds.
-            if (amount > sourceCategory.amountSaved) {
-                tvGoalError.text = "That category only has %.2f in it.".format(sourceCategory.amountSaved)
-                return@setOnClickListener
-            }
+            tvGoalError.text = ""
+
+            // Disabled the instant a transfer is attempted - the same reasoning as
+            // AddExpenseActivity's btnSaveExpense.isEnabled = false: without this, a
+            // second impatient tap could launch a second coroutine that reads this same
+            // source category's balance before the first transfer has finished writing
+            // its deduction, letting both taps pass the cap check below against (and
+            // move out) the same money twice.
+            btnSaveGoal.isEnabled = false
 
             lifecycleScope.launch {
+                // Re-read the source category fresh from Firestore right here, instead
+                // of trusting "categories" - the list this screen loaded once back in
+                // onResume() and never since. See AddExpenseActivity's equivalent fresh
+                // read for the full reasoning: a stale cached balance is exactly how the
+                // cap below could be passed even after this category had already been
+                // moved out of earlier in this same visit to this screen.
+                val sourceCategory = savingsCategoryRepository.getById(pickedSourceCategory.savingsCategoryId)
+                if (sourceCategory == null) {
+                    tvGoalError.text = "That category no longer exists - go back and try again."
+                    btnSaveGoal.isEnabled = true
+                    return@launch
+                }
+
+                // The cap: can't move more out of a category than it currently holds -
+                // checked here, against the fresh read above, not the cached copy.
+                if (amount > sourceCategory.amountSaved) {
+                    tvGoalError.text = "That category only has %.2f in it.".format(sourceCategory.amountSaved)
+                    btnSaveGoal.isEnabled = true
+                    return@launch
+                }
+
                 // Take the amount out of the source category first.
                 savingsCategoryRepository.update(
                     sourceCategory.copy(amountSaved = sourceCategory.amountSaved - amount)
                 )
 
                 // If a category with the destination name already exists, add to it;
-                // otherwise create a brand-new one holding just this amount.
-                val existingDestination = categories.firstOrNull { it.name.equals(destinationName, ignoreCase = true) }
+                // otherwise create a brand-new one holding just this amount. Re-read
+                // fresh for the same reason as the source category above, rather than
+                // searching the cached "categories" list, in case the destination is
+                // also the target of an expense/transfer earlier in this same visit.
+                val existingDestination = savingsCategoryRepository
+                    .getCategoriesForChild(childId)
+                    .firstOrNull { it.name.equals(destinationName, ignoreCase = true) && it.savingsCategoryId != sourceCategory.savingsCategoryId }
                 if (existingDestination != null) {
                     savingsCategoryRepository.update(
                         existingDestination.copy(amountSaved = existingDestination.amountSaved + amount)
