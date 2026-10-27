@@ -6,31 +6,31 @@ As of Part 3, the app's data (parent accounts, child accounts, savings categorie
 
 ## Featured Screens
 
-- **Login** - a single screen where either a parent or a child can log in, with a toggle to choose which account type is signing in.
-- **Register (Parent / Child)** - separate registration screens for creating a new parent account or registering a child under an existing parent, including the child's starting savings category, monthly allowance, and minimum/maximum monthly spend.
-- **Parent Home** - lists the parent's registered children and lets the parent register a new child or open a selected child's detail screen.
-- **Child Detail (Parent view)** - the parent's view of one specific child, now split into four tabs: Stats (balance and budget summary, with account editing and the min/max monthly spend gauge), Categories (the child's savings categories as swipeable jar cards), Quests (the child's chore list, with a progress tracker and a batch "Confirm" action that pays out every completed quest at once), and History (a per-category spending summary with a link to the full expense history).
-- **Child Home** - the child's own landing screen after logging in, organised the same way as the parent's Child Detail screen (Stats / Categories / Quests / History tabs), so a child manages their own account with the same layout the parent uses to view it.
-- **Move Money Between Categories** - lets money already saved in one category be shifted into another, without ever creating money that wasn't there to begin with.
-- **Add Expense** - logs a new expense against a chosen savings category, with an optional photo of the receipt.
-- **Expense History** - a filterable log of a child's expenses, with a date range, a toggle between viewing every entry or just each category's total, and a bar graph of spending per category with the child's monthly min/max spend goals drawn across it as reference lines.
+* **Login** - a single screen where either a parent or a child can log in, with a toggle to choose which account type is signing in.
+* **Register (Parent / Child)** - separate registration screens for creating a new parent account or registering a child under an existing parent, including the child's starting savings category, monthly allowance, and minimum/maximum monthly spend.
+* **Parent Home** - lists the parent's registered children and lets the parent register a new child or open a selected child's detail screen.
+* **Child Detail (Parent view)** - the parent's view of one specific child, now split into four tabs: Stats (balance and budget summary, with account editing and the min/max monthly spend gauge), Categories (the child's savings categories as swipeable jar cards), Quests (the child's chore list, with a progress tracker and a batch "Confirm" action that pays out every completed quest at once), and History (a per-category spending summary with a link to the full expense history).
+* **Child Home** - the child's own landing screen after logging in, organised the same way as the parent's Child Detail screen (Stats / Categories / Quests / History tabs), so a child manages their own account with the same layout the parent uses to view it.
+* **Move Money Between Categories** - lets money already saved in one category be shifted into another, without ever creating money that wasn't there to begin with.
+* **Add Expense** - logs a new expense against a chosen savings category, with an optional photo of the receipt.
+* **Expense History** - a filterable log of a child's expenses, with a date range, a toggle between viewing every entry or just each category's total, and a bar graph of spending per category with the child's monthly min/max spend goals drawn across it as reference lines.
 
 ## Features/Functionality
 
-- Separate parent and child account types, each with their own login and registration flow
-- Input validation on login and registration, including minimum username length, minimum password length, and a required special character in passwords
-- Savings categories that a child can add, rename, and delete, with money automatically redirected to a protected "General" category if one is deleted
-- A parent-set monthly allowance, plus minimum and maximum monthly spending limits, editable at any time from the child's detail screen, with a half-circle gauge showing how this month's spending compares against those limits at a glance
-- A child's balance is always calculated as the sum of their own categories, rather than stored separately, so it can never drift out of sync
-- Money can be moved between a child's own categories, or added to their balance by the parent, but is never created out of nowhere
-- A quest/chore system - the parent assigns quests (once-off, daily or weekly) with a cash reward, the child checks them off, and the parent confirms and pays out everything completed in one batch
-- Expense logging with an optional receipt photo attached to each entry
-- Expense history with date-range filtering, a toggle between an entry-by-entry view and a per-category totals view, and a spend-per-category graph with the monthly min/max goals overlaid as reference lines
-- A per-category overspending warning, shown the moment an expense pushes that category's spending past its own budget for the month
-- A jar/wallet visual theme throughout - each savings category is drawn as its own coloured jar graphic rather than a plain shape, so categories are easy to tell apart at a glance
-- Data is stored in Firebase Firestore, so a child's accounts, categories and history are available independent of any one device, and update as soon as they're saved
+* Separate parent and child account types, each with their own login and registration flow
+* Input validation on login and registration, including minimum username length, minimum password length, and a required special character in passwords
+* Savings categories that a child can add, rename, and delete, with money automatically redirected to a protected "General" category if one is deleted
+* A parent-set monthly allowance, plus minimum and maximum monthly spending limits, editable at any time from the child's detail screen, with a half-circle gauge showing how this month's spending compares against those limits at a glance
+* A child's balance is always calculated as the sum of their own categories, rather than stored separately, so it can never drift out of sync
+* Money can be moved between a child's own categories, or added to their balance by the parent, but is never created out of nowhere
+* A quest/chore system - the parent assigns quests (once-off, daily or weekly) with a cash reward, the child checks them off, and the parent confirms and pays out everything completed in one batch
+* Expense logging with an optional receipt photo attached to each entry
+* Expense history with date-range filtering, a toggle between an entry-by-entry view and a per-category totals view, and a spend-per-category graph with the monthly min/max goals overlaid as reference lines
+* A per-category overspending warning, shown the moment an expense pushes that category's spending past its own budget for the month
+* A jar/wallet visual theme throughout - each savings category is drawn as its own coloured jar graphic rather than a plain shape, so categories are easy to tell apart at a glance
+* Data is stored in Firebase Firestore, so a child's accounts, categories and history are available independent of any one device, and update as soon as they're saved
 
-## Own Features (Part 3)
+## Own Features
 
 Beyond what the Part 3 brief asked for, we built three extra features:
 
@@ -51,9 +51,11 @@ Beyond what the Part 3 brief asked for, we built three extra features:
 
 ## Developers
 
-- *Danielle Poulton ST10440070 - Lead Programmer*
-- *Giselle Khan ST10447061 - Secondary Programmer*
-- *Ivan Willaims ST10439493 - UI Designer*
+* *Danielle Poulton ST10440070 - Lead Programmer*
+* *Giselle Khan ST10447061 - Secondary Programmer*
+* *Ivan Williams ST10439493 - UI Designer*
 
 ## Youtube Link
-https://youtu.be/tedGs6W2YKQ*
+
+https://youtu.be/tedGs6W2YKQ\*
+
