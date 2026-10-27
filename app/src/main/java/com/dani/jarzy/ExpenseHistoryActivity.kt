@@ -333,7 +333,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
     // One-time chart setup, called once from onCreate() - styling and behaviour that
     // never changes between reloads (colours, disabling the right-hand axis, etc.) lives
     // here, kept separate from updateCategoryChart() below which runs every reload and
-    // only touches the data itself (MPAndroidChart, n.d.).
+    // only touches the data itself (MPAndroidChart, n.d.-a).
     private fun setUpChart() {
         chartCategoryTotals.description.isEnabled = false // no small caption under the chart
         chartCategoryTotals.setFitBars(true)
@@ -346,7 +346,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         // mid-load. Overriding it with a clearer message, styled to match the rest of
         // this screen's text, so if it's ever still showing once the load has actually
         // finished, it's self-explanatory rather than looking like an error
-        // (MPAndroidChart, n.d.).
+        // (MPAndroidChart, n.d.-a).
         chartCategoryTotals.setNoDataText("No expenses logged yet for this child in this date range.")
         chartCategoryTotals.setNoDataTextColor(ContextCompat.getColor(this, R.color.jarzy_blue))
 
@@ -413,7 +413,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
 
         // IndexAxisValueFormatter maps each whole-number x position (0, 1, 2...) back to
         // the matching category name, so the x-axis reads "Clothes", "Games" etc.
-        // instead of plain numbers (MPAndroidChart, n.d.).
+        // instead of plain numbers (MPAndroidChart, n.d.-c).
         chartCategoryTotals.xAxis.valueFormatter = IndexAxisValueFormatter(categories.map { it.name })
         chartCategoryTotals.xAxis.labelCount = categories.size
 
@@ -442,7 +442,7 @@ class ExpenseHistoryActivity : AppCompatActivity() {
         // notifyDataSetChanged() on its own, but calling it again explicitly here, right
         // before invalidate(), is the standard fix the MPAndroidChart wiki/community
         // recommend whenever a chart has looked stuck on its "no data" state despite
-        // data genuinely being set - costs nothing to call twice (MPAndroidChart, n.d.).
+        // data genuinely being set - costs nothing to call twice (MPAndroidChart, n.d.-b).
         chartCategoryTotals.notifyDataSetChanged()
         chartCategoryTotals.invalidate() // redraws the chart with everything set above
     }
@@ -536,9 +536,17 @@ class ExpenseHistoryActivity : AppCompatActivity() {
 //     https://developer.android.com/reference/androidx/core/content/res/ResourcesCompat
 //     [Accessed 14 September 2026].
 
-// MPAndroidChart, n.d. Getting Started [Webpage]. Available at:
+// MPAndroidChart, n.d.-a. Getting Started [Webpage]. Available at:
 //     https://github.com/PhilJay/MPAndroidChart/wiki/Getting-Started
 //     [Accessed 25 October 2026].
+
+// MPAndroidChart, n.d.-b. Dynamic & Realtime Data [Webpage]. Available at:
+//     https://github.com/PhilJay/MPAndroidChart/wiki/Dynamic-&-Realtime-Data
+//     [Accessed 27 October 2026].
+
+// MPAndroidChart, n.d.-c. Setting Data [Webpage]. Available at:
+//     https://github.com/PhilJay/MPAndroidChart/wiki/Setting-Data
+//     [Accessed 27 October 2026].
 
 // JitPack, n.d. JitPack - Easy to use package repository for Maven, Gradle and sbt
 // projects [Webpage]. Available at: https://jitpack.io/ [Accessed 25 October 2026].

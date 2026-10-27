@@ -85,7 +85,7 @@ class CreateSavingsCategoryActivity : AppCompatActivity() {
             // second impatient tap could launch a second coroutine that reads this same
             // source category's balance before the first transfer has finished writing
             // its deduction, letting both taps pass the cap check below against (and
-            // move out) the same money twice.
+            // move out) the same money twice (Reyes, 2022).
             btnSaveGoal.isEnabled = false
 
             lifecycleScope.launch {
@@ -166,3 +166,8 @@ class CreateSavingsCategoryActivity : AppCompatActivity() {
 
 // GeeksforGeeks, 2025. Spinner in Kotlin [Webpage]. Available at:
 //     https://www.geeksforgeeks.org/kotlin/spinner-in-kotlin/ [Accessed 14  September 2026].
+
+// Reyes, G., 2022. Solving Android multiple clicks problem with coroutines - Kotlin
+//     [Webpage]. Available at:
+//     https://medium.com/@gibrannhit/solving-android-multiple-clicks-problem-with-coroutines-kotlin-267d1c2063da
+//     [Accessed 27 October 2026].

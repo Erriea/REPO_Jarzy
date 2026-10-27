@@ -13,7 +13,7 @@ import com.dani.jarzy.data.SavingsCategory
  * Backs the swipeable category cards on the "Categories" tab of both ChildDetailActivity
  * (the parent's per-child view) and ChildHomeActivity (the child's own home screen)
  * this is shown inside a ViewPager2, which uses a RecyclerView.Adapter under the hood like a
- * plain RecyclerView would.
+ * plain RecyclerView would (Android Developers, n.d.-a).
  * One coloured "jar" graphic per savings category, cycling through a small fixed set of
  * vector drawables (and a matching text colour from colors.xml) so categories are easy
  * to tell apart while swiping. Previously this drew a single plain coloured rounded
@@ -78,13 +78,13 @@ class CategoryCubeAdapter(
 
         // Swap in this category's jar graphic instead of recolouring a shared drawable -
         // each jar drawable already bakes in its own stroke/lid colour, so there's no
-        // GradientDrawable.mutate()-and-recolour step needed any more.
+        // GradientDrawable.mutate()-and-recolour step needed any more (Android Developers, n.d.-b).
         holder.jarImage.setImageResource(jarDrawableResIds[paletteIndex])
 
         // The jar's body is a light, near-white fill, so the name/amount text is coloured
         // to match the jar's own colour (instead of the old static white, which was only
         // readable against a solid-colour cube background) so it stays legible on top of
-        // the jar graphic.
+        // the jar graphic (Android Developers, n.d.-c).
         val textColor = ContextCompat.getColor(holder.itemView.context, cubeColorResIds[paletteIndex])
         holder.tvName.setTextColor(textColor)
         holder.tvAmount.setTextColor(textColor)
@@ -93,3 +93,14 @@ class CategoryCubeAdapter(
         holder.tvAmount.text = "%.2f".format(category.amountSaved)
     }
 }
+
+// References:
+// Android Developers, n.d.-a. Create dynamic lists with RecyclerView [Webpage].
+//     Available at: <https://developer.android.com/develop/ui/views/layout/recyclerview>
+//     [Accessed 27 October 2026].
+// Android Developers, n.d.-b. ImageView - setImageResource(int) [Webpage]. Available at:
+//     <https://developer.android.com/reference/android/widget/ImageView#setImageResource(int)>
+//     [Accessed 27 October 2026].
+// Android Developers, n.d.-c. ContextCompat - getColor(Context, int) [Webpage]. Available at:
+//     <https://developer.android.com/reference/androidx/core/content/ContextCompat#getColor(android.content.Context,int)>
+//     [Accessed 27 October 2026].

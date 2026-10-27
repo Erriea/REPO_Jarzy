@@ -68,3 +68,14 @@ class SavingsCategoryRepository {
         return if (doc.exists()) docToCategory(doc) else null
     }
 }
+
+// References:
+// Google, n.d.-a. Add data to Cloud Firestore [Webpage]. Available at:
+//     <https://firebase.google.com/docs/firestore/manage-data/add-data>
+//     [Accessed 27 October 2026].
+// Google, n.d.-b. Perform simple and compound queries in Cloud Firestore [Webpage].
+//     Available at: <https://firebase.google.com/docs/firestore/query-data/queries>
+//     [Accessed 27 October 2026].
+// Kotlin, n.d. kotlinx-coroutines-play-services [Webpage]. Available at:
+//     <https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-play-services/>
+//     [Accessed 27 October 2026].

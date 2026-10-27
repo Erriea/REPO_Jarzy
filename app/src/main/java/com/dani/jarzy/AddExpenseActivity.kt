@@ -168,7 +168,7 @@ class AddExpenseActivity : AppCompatActivity() {
             // from - the exact same starting amount, since neither tap would yet have
             // seen the other's update: a textbook stale-read race condition, and
             // exactly how this screen was letting someone spend more than a category
-            // actually held.
+            // actually held (Reyes, 2022).
             btnSaveExpense.isEnabled = false
 
             lifecycleScope.launch {
@@ -303,3 +303,7 @@ class AddExpenseActivity : AppCompatActivity() {
 // Android Developers, n.d.-b. Calendar.getActualMaximum(int) [Webpage]. Available at:
 //     https://developer.android.com/reference/java/util/Calendar#getActualMaximum(int)
 //     [Accessed 18 October 2026].
+// Reyes, G., 2022. Solving Android multiple clicks problem with coroutines - Kotlin
+//     [Webpage]. Available at:
+//     https://medium.com/@gibrannhit/solving-android-multiple-clicks-problem-with-coroutines-kotlin-267d1c2063da
+//     [Accessed 27 October 2026].
