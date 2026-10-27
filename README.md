@@ -57,5 +57,5 @@ Beyond what the Part 3 brief asked for, we built three extra features:
 
 ## Youtube Link
 
-https://youtu.be/tedGs6W2YKQ\*
+https://www.youtube.com/watch?v=TNkwWnBtuqM*
 
